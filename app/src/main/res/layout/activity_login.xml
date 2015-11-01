@@ -11,7 +11,7 @@
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_marginBottom="8dp" android:visibility="gone" />
 
-    <ScrollView android:id="@+id/create_user_form" android:layout_width="match_parent"
+    <ScrollView android:id="@+id/login_user_form" android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout android:id="@+id/user_info_form" android:layout_width="match_parent"
@@ -22,19 +22,19 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:ems="10"
-                android:id="@+id/create_user_username"
+                android:id="@+id/login_username"
                 android:hint="@string/action_create_username" />
 
-            <EditText android:id="@+id/create_user_password" android:layout_width="match_parent"
+            <EditText android:id="@+id/login_password" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:hint="@string/action_create_user_password"
                 android:imeActionId="@+id/login"
                 android:imeActionLabel="@string/action_sign_in_short"
                 android:imeOptions="actionUnspecified" android:inputType="textPassword"
                 android:maxLines="1" android:singleLine="true" />
 
-            <Button android:id="@+id/create_user_button" style="?android:textAppearanceSmall"
+            <Button android:id="@+id/login_user_button" style="?android:textAppearanceSmall"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" android:text="@string/action_register"
+                android:layout_marginTop="16dp" android:text="@string/action_sign_in_short"
                 android:textStyle="bold"
                 android:layout_gravity="center_horizontal" />
 
