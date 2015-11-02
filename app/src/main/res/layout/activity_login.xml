@@ -38,6 +38,13 @@
                 android:textStyle="bold"
                 android:layout_gravity="center_horizontal" />
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/action_create_user_button"
+                android:id="@+id/create_user_button"
+                android:layout_gravity="center_horizontal" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

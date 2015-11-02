@@ -19,4 +19,5 @@
     <string name="action_create_user_confirm_password">Confirm Password</string>
     <string name="action_create_user_password">Password</string>
     <string name="title_activity_create_user">create_user</string>
+    <string name="action_create_user_button">Create User</string>
 </resources>

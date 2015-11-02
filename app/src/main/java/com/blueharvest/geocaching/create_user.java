@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
@@ -53,6 +54,26 @@ public class create_user extends AppCompatActivity {
         });
         mCreateUserFormView = findViewById(R.id.CreateUsernameForm);
 
+        mUsernameView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > minUsernameLen) {
+                    isUserNameValid();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (mUsernameView.getText().toString().length() == 0) {
+                    mUsernameView.setBackgroundColor(Color.WHITE);
+                }
+            }
+        });
         mPasswordView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -61,12 +82,18 @@ public class create_user extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                isPasswordValid();
+                if (mPasswordView.length() > minPasswordLen && mConfirmPwdView.length() > minPasswordLen) {
+
+                    doPasswordsMatch(mPasswordView.getText().toString(), mConfirmPwdView.getText().toString());
+
+                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                if (mPasswordView.getText().toString().length() == 0) {
+                    mPasswordView.setBackgroundColor(Color.WHITE);
+                }
             }
         });
 
@@ -78,49 +105,21 @@ public class create_user extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                doPasswordsMatch(mPasswordView.getText().toString(), mConfirmPwdView.getText().toString());
+                if (mPasswordView.length() > minPasswordLen && mConfirmPwdView.length() > minPasswordLen) {
+
+                    doPasswordsMatch(mPasswordView.getText().toString(), mConfirmPwdView.getText().toString());
+
+                }
 
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                if (mConfirmPwdView.getText().toString().length() == 0) {
+                    mConfirmPwdView.setBackgroundColor(Color.WHITE);
+                }
             }
         });
-
-        mEmailView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                checkEmail();
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-    }
-
-    private boolean isPasswordValid() {
-        //TODO: Replace this with your own logic
-        String password = mPasswordView.getText().toString();
-
-        if (password.length() >= minPasswordLen) {
-            mPasswordView.setBackgroundColor(Color.GREEN);
-        }
-        else {
-            mPasswordView.setBackgroundColor(Color.RED);
-        }
-
-        return password.length() >= minPasswordLen;
-
     }
 
     private boolean doPasswordsMatch(String password1, String password2) {
@@ -141,9 +140,14 @@ public class create_user extends AppCompatActivity {
 
         return username.length() >= minUsernameLen;
     }
-    private boolean isUserNameValid(String username) {
+    private void isUserNameValid() {
         //TODO: Replace this with the username validation logic
-        return username.length() > minPasswordLen;
+        if( mUsernameView.getText().toString().length() > minPasswordLen) {
+            mUsernameView.setBackgroundColor(Color.GREEN);
+        }
+        else {
+            mUsernameView.setBackgroundColor(Color.RED);
+        }
     }
 
     public void checkEmail() {
@@ -182,8 +186,25 @@ public class create_user extends AppCompatActivity {
         boolean cancel = false;
         View focusView = null;
 
+        // Reset errors.
+        mUsernameView.setError(null);
+        mPasswordView.setError(null);
+        mConfirmPwdView.setError(null);
+        mEmailView.setError(null);
+
+        // Reset Error Colors
+        mUsernameView.setBackgroundColor(Color.WHITE);
+        mPasswordView.setBackgroundColor(Color.WHITE);
+        mConfirmPwdView.setBackgroundColor(Color.WHITE);
+        mEmailView.setBackgroundColor(Color.WHITE);
+
         // Username
-        if (username.length() < minUsernameLen){
+        if (TextUtils.isEmpty(username)) {
+            mUsernameView.setError("This Field is Required");
+            focusView = mUsernameView;
+            cancel = true;
+        }
+        else if (username.length() < minUsernameLen){
             mUsernameView.setError("Username too short");
             mUsernameView.setBackgroundColor(Color.RED);
             focusView = mUsernameView;
@@ -191,71 +212,91 @@ public class create_user extends AppCompatActivity {
         }
 
         // Password
-        if (password.length() < minPasswordLen) {
-            mPasswordView.setError("Password too short");
-            mPasswordView.setBackgroundColor(Color.RED);
-            focusView = mPasswordView;
-            cancel = true;
+        if (!cancel) {
+            if (TextUtils.isEmpty(password)) {
+                mPasswordView.setError("This Field is Required");
+                focusView = mPasswordView;
+                cancel = true;
+            }
+            if (password.length() < minPasswordLen) {
+                mPasswordView.setError("Password too short");
+                mPasswordView.setBackgroundColor(Color.RED);
+                focusView = mPasswordView;
+                cancel = true;
+            }
         }
 
-        Pattern punct = Pattern.compile("[.!?\\-*@]");
-        Matcher m = punct.matcher(password);
-        boolean puncFound = m.find();
-        if (!puncFound) {
-            mPasswordView.setError("No punctuation character");
-            mPasswordView.setBackgroundColor(Color.RED);
-            focusView = mPasswordView;
-            cancel = true;
+        // Find a punctuation character
+        if (!cancel) {
+            Pattern punct = Pattern.compile("[.!?\\-*@]");
+            Matcher m = punct.matcher(password);
+            boolean puncFound = m.find();
+            if (!puncFound) {
+                mPasswordView.setError("No punctuation character");
+                mPasswordView.setBackgroundColor(Color.RED);
+                focusView = mPasswordView;
+                cancel = true;
+            }
         }
 
         // Find a number
-        Pattern number = Pattern.compile("\\d+");
-        Matcher numberMatch = number.matcher(password);
-        boolean numFound = numberMatch.find();
-        if (!numFound) {
-            mPasswordView.setError("No Digit (0-9) Character");
-            mPasswordView.setBackgroundColor(Color.RED);
-            focusView = mPasswordView;
-            cancel = true;
+        if (!cancel) {
+            Pattern number = Pattern.compile("\\d+");
+            Matcher numberMatch = number.matcher(password);
+            boolean numFound = numberMatch.find();
+            if (!numFound) {
+                mPasswordView.setError("No Digit (0-9) Character");
+                mPasswordView.setBackgroundColor(Color.RED);
+                focusView = mPasswordView;
+                cancel = true;
+            }
         }
 
         // Find an upper case character
-        Pattern upper = Pattern.compile("[A-Z]");
-        Matcher upperMatch = upper.matcher(password);
-        boolean upperFound = upperMatch.find();
-        if (!upperFound) {
-            mPasswordView.setError("No uppercase character");
-            mPasswordView.setBackgroundColor(Color.RED);
-            focusView = mPasswordView;
-            cancel = true;
+        if (!cancel) {
+            Pattern upper = Pattern.compile("[A-Z]");
+            Matcher upperMatch = upper.matcher(password);
+            boolean upperFound = upperMatch.find();
+            if (!upperFound) {
+                mPasswordView.setError("No uppercase character");
+                mPasswordView.setBackgroundColor(Color.RED);
+                focusView = mPasswordView;
+                cancel = true;
+            }
         }
 
         // Find a lower case character
-        Pattern lower = Pattern.compile("[a-z]");
-        Matcher lowerMatch = lower.matcher(password);
-        boolean lowerFound = lowerMatch.find();
-        if (!lowerFound) {
-            mPasswordView.setError("No lowercase character");
-            mPasswordView.setBackgroundColor(Color.RED);
-            focusView = mPasswordView;
-            cancel = true;
+        if (!cancel) {
+            Pattern lower = Pattern.compile("[a-z]");
+            Matcher lowerMatch = lower.matcher(password);
+            boolean lowerFound = lowerMatch.find();
+            if (!lowerFound) {
+                mPasswordView.setError("No lowercase character");
+                mPasswordView.setBackgroundColor(Color.RED);
+                focusView = mPasswordView;
+                cancel = true;
+            }
         }
 
         // Verify passwords Match
-        if (!password.equals(confPwd)) {
-            mPasswordView.setError("Passwords Do Not Match");
-            mPasswordView.setBackgroundColor(Color.RED);
-            mConfirmPwdView.setBackgroundColor(Color.RED);
-            focusView = mPasswordView;
-            cancel = true;
+        if (!cancel) {
+            if (!password.equals(confPwd)) {
+                mPasswordView.setError("Passwords Do Not Match");
+                mPasswordView.setBackgroundColor(Color.RED);
+                mConfirmPwdView.setBackgroundColor(Color.RED);
+                focusView = mPasswordView;
+                cancel = true;
+            }
         }
 
         // Check Email
-        if (!email.contains("@")) {
-            mEmailView.setError("Missing Email");
-            mEmailView.setBackgroundColor(Color.RED);
-            focusView = mEmailView;
-            cancel = true;
+        if (!cancel) {
+            if (!email.contains("@")) {
+                mEmailView.setError("Missing Email");
+                mEmailView.setBackgroundColor(Color.RED);
+                focusView = mEmailView;
+                cancel = true;
+            }
         }
 
         if (cancel) {
@@ -276,9 +317,7 @@ public class create_user extends AppCompatActivity {
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
      */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
+    private static final String DUMMY_CREDENTIALS = "newUser1:TeStInG.1234:email@domain.com";
 
     public class UserCreateTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -303,28 +342,22 @@ public class create_user extends AppCompatActivity {
                 return false;
             }
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
+            String[] pieces = DUMMY_CREDENTIALS.split(":");
+            return !(pieces[0].equals(mUsername) || pieces[2].equals(mEmail));
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
             mCreateTask = null;
+            String error_user_exist = "Error User Already Exists";
             //showProgress(false);
 
             if (success) {
                 finish();
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+                mUsernameView.setError(error_user_exist);
+                mUsernameView.setBackgroundColor(Color.RED);
+                mUsernameView.requestFocus();
             }
         }
 
