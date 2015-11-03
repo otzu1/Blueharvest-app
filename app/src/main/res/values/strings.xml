@@ -20,4 +20,7 @@
     <string name="action_create_user_password">Password</string>
     <string name="title_activity_create_user">create_user</string>
     <string name="action_create_user_button">Create User</string>
+    <string name="error_invalid_username">This username is Invalid</string>
+    <string name="title_activity_user_home_page">user_home_page</string>
+    <string name="action_quit">Quit</string>
 </resources>

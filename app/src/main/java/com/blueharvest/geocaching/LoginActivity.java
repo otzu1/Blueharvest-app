@@ -40,13 +40,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
+    private static final int minPasswordLen = 6;
+    private static final int minUsernameLen = 6;
 
     /**
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
+            "newUser1:TeStInG.1234", "newUser2:Tests!1234"
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -77,8 +79,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.login_user_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        Button mSignInButton = (Button) findViewById(R.id.login_user_button);
+        mSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
@@ -175,8 +177,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mLoginUserNameView.setError(getString(R.string.error_field_required));
             focusView = mLoginUserNameView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
-            mLoginUserNameView.setError(getString(R.string.error_invalid_email));
+        } else if (!isUsernameValid(email)) {
+            mLoginUserNameView.setError(getString(R.string.error_invalid_username));
             focusView = mLoginUserNameView;
             cancel = true;
         }
@@ -194,14 +196,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    private boolean isEmailValid(String email) {
+    private boolean isUsernameValid(String username) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        return username.length() >= minUsernameLen;
     }
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() > minPasswordLen;
     }
 
     /**
@@ -289,16 +291,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mEmail;
+        private final String mUsername;
         private final String mPassword;
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
+        UserLoginTask(String username, String password) {
+            mUsername = username;
             mPassword = password;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
+            boolean returnVal = false;
+
             // TODO: attempt authentication against a network service.
 
             try {
@@ -310,14 +314,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             for (String credential : DUMMY_CREDENTIALS) {
                 String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
+                if (pieces[0].equals(mUsername)) {
                     // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+                    returnVal = pieces[1].equals(mPassword);
                 }
             }
 
             // TODO: register the new account here.
-            return true;
+            return returnVal;
         }
 
         @Override
@@ -327,6 +331,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 finish();
+                startActivity(new Intent(LoginActivity.this, user_home_page.class));
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
