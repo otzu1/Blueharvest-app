@@ -23,4 +23,6 @@
     <string name="error_invalid_username">This username is Invalid</string>
     <string name="title_activity_user_home_page">user_home_page</string>
     <string name="action_quit">Quit</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_login2">Sign in</string>
 </resources>
