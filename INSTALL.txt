@@ -1,0 +1,9 @@
+1. Clone this repository and build
+2. Add Google Maps Key
+3. Add Dependencies - app/lib --> blueharvest and ksoap2 libs and build.gradle --> specify compilation
+
+What to do when ...
+... a seg fault in an Android Virtual Device happens? Check the API. Minimum API is 23 w/Google Play Services for the emulators.
+... NoClassDefFoundError occurs? See 3.
+... the emulator is asking to download or update Google Play Services? Check the emulator API.
+... [todo]

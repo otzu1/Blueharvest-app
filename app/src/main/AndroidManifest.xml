@@ -16,6 +16,8 @@
     <uses-permission android:name="com.blueharvest.geocaching.permission.MAPS_RECIEVE" />
     <uses-permission android:name="com.blueharvest.geocaching.permission.ACCESS_FINE_LOCATION" />
 
+    <!--// For Internet access (web services, too) //-->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine

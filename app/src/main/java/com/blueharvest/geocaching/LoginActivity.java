@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * TODO: remove after connecting to a real authentication system.
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "newUser1:TeStInG.1234", "newUser2:Tests!1234"
+            "newUser1:TeStInG.1234", "newUser2:Tests!1234", "jamie:password"
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -183,6 +183,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
 
+        // jmb: I put this here to test a username and password which is not strict
+        //cancel = false; // todo: remove after testing!
+
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -304,6 +307,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             boolean returnVal = false;
 
             // TODO: attempt authentication against a network service.
+
+
+            // here's an example of how to auth a user.
+            // check logcat for the result :)
+            System.out.println("testing here ... ");
+            try {
+                System.out.println(String.valueOf(
+                        blueharvest.geocaching.soap.objects.user.auth("<username>", "<password>")));
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+
 
             try {
                 // Simulate network access.
