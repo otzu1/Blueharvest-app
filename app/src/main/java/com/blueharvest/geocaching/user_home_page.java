@@ -45,7 +45,7 @@ public class user_home_page extends AppCompatActivity implements
          */
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
 
-        if ( permissionCheck == PackageManager.PERMISSION_GRANTED){
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             setupMap();
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -58,13 +58,13 @@ public class user_home_page extends AppCompatActivity implements
                         public void onClick(View view) {
                             // Request the permission
                             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                        MY_LOCATION_PERMISSION);
+                                    MY_LOCATION_PERMISSION);
                         }
                     }).show();
                 } else {
 
                     requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                MY_LOCATION_PERMISSION);
+                            MY_LOCATION_PERMISSION);
                 }
             }
         }
@@ -96,7 +96,7 @@ public class user_home_page extends AppCompatActivity implements
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
 
         // Showing status
-        if(status!=ConnectionResult.SUCCESS){ // Google Play Services are not available
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are not available
 
             int requestCode = 10;
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, requestCode);
@@ -125,7 +125,7 @@ public class user_home_page extends AppCompatActivity implements
 
             int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
 
-            if ( permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
                 // Getting Current Location
                 Location location = locationManager.getLastKnownLocation(provider);
 
