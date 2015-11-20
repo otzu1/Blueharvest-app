@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="geocache_terrain">
+        <item>easy</item>
+        <item>tricky</item>
+        <item>challenging</item>
+        <item>demanding</item>
+        <item>grueling</item>
+        <item>impossible</item>
+    </string-array>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="geocache_difficulty">
+        <item>effortless</item>
+        <item>mild</item>
+        <item>challenging</item>
+        <item>strenuous</item>
+        <item>extreme</item>
+        <item>impossible</item>
+    </string-array>
+</resources>
