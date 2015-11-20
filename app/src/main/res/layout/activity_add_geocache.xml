@@ -29,7 +29,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:layout_weight="0.09">
+                >
 
                 <fragment
                     android:id="@+id/map"
@@ -46,9 +46,10 @@
             </RelativeLayout>
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                >
 
                 <EditText
                     android:id="@+id/latitude"
@@ -72,74 +73,77 @@
             <EditText
                 android:id="@+id/name"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.17"
-                android:hint="@string/add_geocache_name"
+                android:layout_height="wrap_content"
+                android:autoText="false"
                 android:capitalize="words"
-                android:autoText="false"/>
+                android:hint="@string/add_geocache_name"/>
 
             <EditText
                 android:id="@+id/description"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="0.17"
                 android:ems="10"
                 android:hint="@string/add_geocache_description"
                 android:inputType="textCapSentences|textAutoComplete|textAutoCorrect|textMultiLine"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="0.17"
+                android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:weightSum="1">
+                android:weightSum="1"
+                android:layout_weight="1">
 
                 <EditText
                     android:id="@+id/code"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.50"
-                    android:hint="@string/add_geocache_code"/>
+                    android:layout_weight="0.75"
+                    android:hint="@string/add_geocache_code"
+                    android:layout_gravity="bottom"/>
 
-                <ListView
+                <Spinner
+                    android:layout_width="110dp"
+                    android:layout_height="match_parent"
                     android:id="@+id/type"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.50"
-                    android:choiceMode="singleChoice"/>
+                    android:spinnerMode="dropdown"
+                    android:layout_weight="0.25"/>
 
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="63dp"
-                android:layout_weight="0.17"
+                android:layout_height="62dp"
+                android:baselineAligned="false"
                 android:orientation="horizontal"
-                android:baselineAligned="false">
+                >
 
-                <ListView
+                <Spinner
+                    android:layout_width="115dp"
+                    android:layout_height="50dp"
                     android:id="@+id/size"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:choiceMode="singleChoice"/>
+                    android:spinnerMode="dropdown"/>
 
-                <ListView
+                <Spinner
+                    android:layout_width="115dp"
+                    android:layout_height="50dp"
                     android:id="@+id/terrain"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:choiceMode="singleChoice"/>
+                    android:spinnerMode="dropdown"/>
 
-                <ListView
+                <Spinner
+                    android:layout_width="115dp"
+                    android:layout_height="50dp"
                     android:id="@+id/difficulty"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:choiceMode="singleChoice"/>
+                    android:spinnerMode="dropdown"
+                    />
             </LinearLayout>
+
+            <Button
+                android:id="@+id/save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/add_geocache_save"/>
 
         </LinearLayout>
 

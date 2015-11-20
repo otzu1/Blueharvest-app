@@ -31,7 +31,6 @@ public class create_user extends AppCompatActivity {
      */
     private UserCreateTask mCreateTask = null;
 
-
     // UI references.
     private EditText mUsernameView;
     private EditText mPasswordView;
