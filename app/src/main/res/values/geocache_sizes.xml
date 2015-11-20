@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="geocache_sizes">
+        <item>super petit</item>
+        <item>petit</item>
+        <item>moyen</item>
+        <item>grand</item>
+        <item>extra large</item>
+        <item>grandiose</item>
+        <item>enorme</item>
+        <item>unknown</item>
+        <item>none</item>
+    </string-array>
+</resources>
