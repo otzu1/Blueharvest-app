@@ -1,6 +1,5 @@
 package com.blueharvest.geocaching;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
@@ -53,7 +52,6 @@ public class user_home_page extends AppCompatActivity implements
 
                     Snackbar.make(mMapView, "Location access is required to show your current position.",
                             Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
-                        @SuppressLint("NewApi")
                         @Override
                         public void onClick(View view) {
                             // Request the permission

@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -56,6 +57,7 @@ public class create_user extends AppCompatActivity {
             }
         });
         mCreateUserFormView = findViewById(R.id.CreateUsernameForm);
+        mProgressView = findViewById(R.id.create_user_progress);
 
         mUsernameView.addTextChangedListener(new TextWatcher() {
             @Override
@@ -311,7 +313,7 @@ public class create_user extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             //showProgress(true);
-            mCreateTask = new UserCreateTask(username, password, email);
+            mCreateTask = new UserCreateTask();
             mCreateTask.execute((Void) null);
         }
     }
@@ -353,47 +355,48 @@ public class create_user extends AppCompatActivity {
     }
 
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String DUMMY_CREDENTIALS = "newUser1:TeStInG.1234:email@domain.com";
-
     public class UserCreateTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mUsername;
         private final String mEmail;
+        private final String mPassword;
+        private final static String tag = "blueharvest"; // logcat tag
 
-        UserCreateTask (String username, String password, String email) {
-            mEmail = email;
-            mUsername = username;
+        UserCreateTask () {
+            mEmail = mEmailView.getText().toString();
+            mUsername = mUsernameView.getText().toString();
+            mPassword = mPasswordView.getText().toString();
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+
+            boolean success = false;
 
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
+                success = blueharvest.geocaching.soap.objects.user.insert(mUsername, mPassword, mEmail, "Basic");
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
             }
 
-            String[] pieces = DUMMY_CREDENTIALS.split(":");
-            return !(pieces[0].equals(mUsername) || pieces[2].equals(mEmail));
+            // Write result to LogCat
+            Log.d(tag, "Was the user inserted? " + String.valueOf(success));
+
+            return success;
+
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
             mCreateTask = null;
-            String error_user_exist = "Error User Already Exists";
-            //showProgress(false);
+            String error_user_exists = "Error User Already Exists";
+            showProgress(false);
 
             if (success) {
                 finish();
             } else {
-                mUsernameView.setError(error_user_exist);
+                mUsernameView.setError(error_user_exists);
                 mUsernameView.setBackgroundColor(Color.RED);
                 mUsernameView.requestFocus();
             }
@@ -402,7 +405,7 @@ public class create_user extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             mCreateTask = null;
-            //showProgress(false);
+            showProgress(false);
         }
     }
 
