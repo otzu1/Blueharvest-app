@@ -15,6 +15,12 @@
         android:layout_alignBottom="@+id/createUserButton"
         android:id="@+id/CreateUsernameForm">
 
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="11dp"
+            android:layout_height="11dp"
+            android:id="@+id/create_user_progress" />
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

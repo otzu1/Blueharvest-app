@@ -44,13 +44,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final int minUsernameLen = 6;
 
     /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "newUser1:TeStInG.1234", "newUser2:Tests!1234"
-    };
-    /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
@@ -158,7 +151,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mLoginUserNameView.getText().toString();
+        String username = mLoginUserNameView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
@@ -171,12 +164,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
 
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
+        // Check for a valid username.
+        if (TextUtils.isEmpty(username)) {
             mLoginUserNameView.setError(getString(R.string.error_field_required));
             focusView = mLoginUserNameView;
             cancel = true;
-        } else if (!isUsernameValid(email)) {
+        } else if (!isUsernameValid(username)) {
             mLoginUserNameView.setError(getString(R.string.error_invalid_username));
             focusView = mLoginUserNameView;
             cancel = true;
@@ -193,18 +186,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask();
             mAuthTask.execute((Void) null);
         }
     }
 
     private boolean isUsernameValid(String username) {
-        //TODO: Replace this with your own logic
         return username.length() >= minUsernameLen;
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > minPasswordLen;
     }
 
@@ -296,46 +287,27 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private final String mUsername;
         private final String mPassword;
 
-        UserLoginTask(String username, String password) {
-            mUsername = username;
-            mPassword = password;
+        UserLoginTask() {
+            mUsername = mLoginUserNameView.getText().toString();
+            mPassword = mPasswordView.getText().toString();
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            boolean returnVal = false;
-
-            // TODO: attempt authentication against a network service.
-
+            boolean success = false;
 
             // here's an example of how to auth a user.
             // check logcat for the result :)
             System.out.println("testing here ... ");
             try {
-                System.out.println(String.valueOf(
-                        blueharvest.geocaching.soap.objects.user.auth("<username>", "<password>")));
+                success =
+                        blueharvest.geocaching.soap.objects.user.auth(mUsername, mPassword);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
 
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mUsername)) {
-                    // Account exists, return true if the password matches.
-                    returnVal = pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return returnVal;
+            return success;
         }
 
         @Override
