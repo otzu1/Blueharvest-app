@@ -316,9 +316,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 // we'll just clear the preference (that one only)
                 // and add the currently auth'ed to exist.
                 editor.remove("me");
-                editor.commit();
+                editor.apply();
                 editor.putString("me", me);
-                editor.commit();
+                editor.apply();
             }
 
             return success;

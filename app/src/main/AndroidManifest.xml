@@ -60,7 +60,6 @@
             android:label="@string/title_activity_user_home_page"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
-
         <activity android:name=".AddGeocacheActivity" >
         </activity>
 
@@ -76,6 +75,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <activity android:name=".ViewGeocacheActivity" >
+        </activity>
     </application>
 
 </manifest>

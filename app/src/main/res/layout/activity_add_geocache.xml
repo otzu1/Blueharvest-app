@@ -86,12 +86,12 @@
                 android:layout_gravity="center_horizontal"
                 android:ems="10"
                 android:hint="@string/add_geocache_description"
-                android:inputType="textCapSentences|textAutoComplete|textAutoCorrect|textMultiLine"/>
+                android:inputType="textCapSentences|textAutoComplete|textAutoCorrect|textMultiLine"
+                />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:weightSum="1">
 
@@ -114,26 +114,25 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="62dp"
+                android:layout_height="match_parent"
                 android:baselineAligned="false"
-                android:orientation="horizontal"
-                >
+                android:orientation="horizontal">
 
                 <Spinner
                     android:id="@+id/size"
-                    android:layout_width="117dp"
+                    android:layout_width="115dp"
                     android:layout_height="50dp"
                     android:spinnerMode="dropdown"/>
 
                 <Spinner
                     android:id="@+id/terrain"
-                    android:layout_width="117dp"
+                    android:layout_width="115dp"
                     android:layout_height="50dp"
                     android:spinnerMode="dropdown"/>
 
                 <Spinner
                     android:id="@+id/difficulty"
-                    android:layout_width="117dp"
+                    android:layout_width="115dp"
                     android:layout_height="50dp"
                     android:spinnerMode="dropdown"/>
             </LinearLayout>
