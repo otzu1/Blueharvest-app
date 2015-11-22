@@ -375,6 +375,22 @@ public class create_user extends AppCompatActivity {
 
             try {
                 success = blueharvest.geocaching.soap.objects.user.insert(mUsername, mPassword, mEmail, "Basic");
+
+                // todo: there could be at least two reasons why the insert failed
+                if (!success) {
+                    // 1. the username exists
+                    if (blueharvest.geocaching.soap.objects.user.exists(mUsername)) {
+                        // do something
+                    //} else if (blueharvest.geocaching.soap.objects.user.exists(mEmail)) {
+                        // 2.
+                        // todo: we need a function to check for the user's email
+                        // todo: the insert will return false and enforced in the database
+                        // todo: once the function is available, use it here
+                    } else {
+                        // do something
+                    }
+                }
+
             }
             catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -395,6 +411,11 @@ public class create_user extends AppCompatActivity {
 
             if (success) {
                 finish();
+                // todo: the user is redirected to the login page
+                // todo: if the user is directed elsewhere,
+                // todo: we need to make sure we specify
+                // todo: the "me" shared preference
+                // todo: see loginactivity's shared preference code
             } else {
                 mUsernameView.setError(error_user_exists);
                 mUsernameView.setBackgroundColor(Color.RED);
