@@ -20,7 +20,7 @@ import com.google.android.gms.location.LocationServices;
  *
  * @see <a href="https://raw.githubusercontent.com/treehouse/android-location-example-refactored/master/app/src/main/java/teamtreehouse/com/iamhere/LocationProvider.java">
  * com.blueharvest.geocaching.LocationProvider.java</a>
- * <p>
+ *
  * Any activity using a map fragment may use this class to provide location functionality including
  * current location. Async Tasks are necessary in the implementing classes.
  */
