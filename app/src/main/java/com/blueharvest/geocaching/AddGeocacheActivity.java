@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 /**
  * Add Geocache Activity<br>
@@ -41,7 +43,7 @@ import java.text.DecimalFormat;
  * a suggested random code (blueharvest-0.0.3+ required). Spinner controls are used for enumerating
  * values for size, terrain, and difficulty. The values for the enumerations are found hard-coded
  * in each respective .xml resource file in a string array and accessible through an adapter.
- * <p>
+ * <p/>
  * Eventually, this activity is to direct the user to the geocache details page not yet started.
  *
  * @see <a href="http://developer.android.com/guide/topics/ui/controls/spinner.html">
@@ -56,23 +58,8 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
     // map
     private final static int MY_LOCATION_PERMISSION = 1;
     private final static double distance = 10; // km
-    private LocationProvider locationProvider;
     private GoogleMap map;
     private blueharvest.geocaching.soap.objects.geocache.geocaches geocaches;
-    // coordinates in decimal degrees, +/- to specify bearing, up to 7 decimal places, ranged
-    // see http://www.regexlib.com/REDetails.aspx?regexp_id=1535
-    private double latitude; // ^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,7}
-    // see http://www.regexlib.com/REDetails.aspx?regexp_id=1536
-    private double longitude; // ^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,7}
-
-    private EditText name;
-    private EditText description;
-    private EditText code;
-    // http://developer.android.com/guide/topics/ui/controls/spinner.html
-    private Spinner size;
-    private Spinner terrain;
-    private Spinner difficulty;
-    private Button save;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,43 +69,61 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         // map including default latitude and longitude
         setUpMap();
 
-        // context controls
-        name = (EditText) findViewById(R.id.name);
-        description = (EditText) findViewById(R.id.description);
-        code = (EditText) findViewById(R.id.code);
-        size = (Spinner) findViewById(R.id.size);
-        //String[] sizes = getResources().getStringArray(R.array.geocache_sizes);
+        // type spinner
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(this,
+                R.array.geocache_types, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        ((Spinner) findViewById(R.id.type)).setAdapter(typeAdapter);
+
+        // size spinner
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> sizeAdapter = ArrayAdapter.createFromResource(this,
                 R.array.geocache_sizes, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         sizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        size.setAdapter(sizeAdapter);
-        terrain = (Spinner) findViewById(R.id.terrain);
+        ((Spinner) findViewById(R.id.size)).setAdapter(sizeAdapter);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> terrainAdapter = ArrayAdapter.createFromResource(this,
                 R.array.geocache_terrain, android.R.layout.simple_spinner_item);
+        // terrain spinner
         // Specify the layout to use when the list of choices appears
         terrainAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        terrain.setAdapter(terrainAdapter);
-        difficulty = (Spinner) findViewById(R.id.difficulty);
+        ((Spinner) findViewById(R.id.terrain)).setAdapter(terrainAdapter);
+        // difficulty spinner
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> difficultyAdapter = ArrayAdapter.createFromResource(this,
                 R.array.geocache_difficulty, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         difficultyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        difficulty.setAdapter(difficultyAdapter);
+        ((Spinner) findViewById(R.id.difficulty)).setAdapter(difficultyAdapter);
+
         // save button with click listener
-        save = (Button) findViewById(R.id.save);
+        Button save = (Button) findViewById(R.id.save);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // do something when the save button is clicked.
+                // send the params to the background thread to add the geocache
+                // we're sending strings and the background thread will take care of the rest
+                String[] params = new String[10];
+                params[0] = ((EditText) findViewById(R.id.latitude)).getText().toString();
+                params[1] = ((EditText) findViewById(R.id.longitude)).getText().toString();
+                params[2] = ((EditText) findViewById(R.id.name)).getText().toString();
+                params[3] = ((EditText) findViewById(R.id.description)).getText().toString();
+                params[4] = ((EditText) findViewById(R.id.code)).getText().toString();
+                params[5] = String.valueOf(((Spinner) findViewById(R.id.type)).getSelectedItemPosition());
+                params[5] = String.valueOf(((Spinner) findViewById(R.id.size)).getSelectedItemPosition());
+                params[6] = String.valueOf(((Spinner) findViewById(R.id.terrain)).getSelectedItemPosition());
+                params[7] = String.valueOf(((Spinner) findViewById(R.id.difficulty)).getSelectedItemPosition());
+                new AddGeocacheTask().execute(params);
             }
         });
+
         // todo: to go to another activity ...
         // startActivity(new Intent(LoginActivity.this, create_user.class));
 
@@ -244,7 +249,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
 
     /**
      * Called when the location has changed.
-     * <p>
+     * <p/>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.
@@ -269,11 +274,11 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
      *                 provider is currently available.
      * @param extras   an optional Bundle which will contain provider specific
      *                 status variables.
-     *                 <p>
+     *                 <p/>
      *                 <p> A number of common key/value pairs for the extras Bundle are listed
      *                 below. Providers that use any of the keys on this list must
      *                 provide the corresponding value as described below.
-     *                 <p>
+     *                 <p/>
      *                 <ul>
      *                 <li> satellites - the number of satellites used to derive the fix
      */
@@ -314,7 +319,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
          * Override this method to perform a computation on a background thread. The
          * specified parameters are the parameters passed to {@link #execute}
          * by the caller of this task.
-         * <p>
+         * <p/>
          * This method can call {@link #publishProgress} to publish updates
          * on the UI thread.
          *
@@ -344,6 +349,38 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
             //showDialog("something");
         }
 
+    }
+
+    public class AddGeocacheTask extends AsyncTask<String, Void, Boolean> {
+
+        /**
+         * Override this method to perform a computation on a background thread. The
+         * specified parameters are the parameters passed to {@link #execute}
+         * by the caller of this task.
+         * <p/>
+         * This method can call {@link #publishProgress} to publish updates
+         * on the UI thread.
+         *
+         * @param params The parameters of the task.
+         * @return A result, defined by the subclass of this task.
+         * @see #onPreExecute()
+         * @see #onPostExecute
+         * @see #publishProgress
+         */
+        @Override
+        protected Boolean doInBackground(String... params) {
+            Log.d(TAG, params[0]);
+
+            blueharvest.geocaching.soap.objects.geocache g
+                    = new blueharvest.geocaching.soap.objects.geocache(
+                    null, null, "BH13GC7","Statue of Liberty", "description",
+                    5, 10, 1, 1, 1, blueharvest.geocaching.soap.objects.user.get("username", "password"),
+                    null, new blueharvest.geocaching.soap.objects.location( null, "Statue of Liberty",
+                    40.689247, -74.044502, 3, null), null);
+            //t = blueharvest.geocaching.soap.objects.geocache.insert(g1);
+
+            return null;
+        }
     }
 
 }
