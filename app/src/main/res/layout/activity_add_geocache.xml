@@ -28,13 +28,15 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                >
+                android:layout_height="200dp">
 
                 <fragment
                     android:id="@+id/map"
-                    android:name="com.google.android.gms.maps.MapFragment"
-                    android:layout_width="wrap_content"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:map="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentEnd="true"
@@ -48,8 +50,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
-                >
+                android:orientation="horizontal">
 
                 <EditText
                     android:id="@+id/latitude"
@@ -90,24 +91,24 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_weight="1"
                 android:orientation="horizontal"
-                android:weightSum="1"
-                android:layout_weight="1">
+                android:weightSum="1">
 
                 <EditText
                     android:id="@+id/code"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
                     android:layout_weight="0.75"
-                    android:hint="@string/add_geocache_code"
-                    android:layout_gravity="bottom"/>
+                    android:hint="@string/add_geocache_code"/>
 
                 <Spinner
+                    android:id="@+id/type"
                     android:layout_width="110dp"
                     android:layout_height="match_parent"
-                    android:id="@+id/type"
-                    android:spinnerMode="dropdown"
-                    android:layout_weight="0.25"/>
+                    android:layout_weight="0.25"
+                    android:spinnerMode="dropdown"/>
 
             </LinearLayout>
 
@@ -119,24 +120,22 @@
                 >
 
                 <Spinner
-                    android:layout_width="117dp"
-                    android:layout_height="50dp"
                     android:id="@+id/size"
-                    android:spinnerMode="dropdown"
-                    />
-
-                <Spinner
                     android:layout_width="117dp"
                     android:layout_height="50dp"
-                    android:id="@+id/terrain"
                     android:spinnerMode="dropdown"/>
 
                 <Spinner
+                    android:id="@+id/terrain"
                     android:layout_width="117dp"
                     android:layout_height="50dp"
+                    android:spinnerMode="dropdown"/>
+
+                <Spinner
                     android:id="@+id/difficulty"
-                    android:spinnerMode="dropdown"
-                    />
+                    android:layout_width="117dp"
+                    android:layout_height="50dp"
+                    android:spinnerMode="dropdown"/>
             </LinearLayout>
 
             <Button

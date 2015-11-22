@@ -1,13 +1,15 @@
 package com.blueharvest.geocaching;
 
 import android.app.Dialog;
-import android.content.Intent;
-import android.graphics.Color;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -15,15 +17,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.text.DecimalFormat;
 
 /**
  * Add Geocache Activity<br>
@@ -45,21 +48,23 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Populate the Spinner with User Choices</a>
  * @since 2015-11-19
  */
-public class AddGeocacheActivity extends FragmentActivity
-        implements LocationProvider.LocationCallback {
+public class AddGeocacheActivity extends FragmentActivity implements LocationListener {
 
     // for logging
     public static final String TAG = "blueharvest:: " + AddGeocacheActivity.class.getSimpleName();
 
+    // map
+    private final static int MY_LOCATION_PERMISSION = 1;
+    private final static double distance = 10; // km
     private LocationProvider locationProvider;
     private GoogleMap map;
     private blueharvest.geocaching.soap.objects.geocache.geocaches geocaches;
-    private final static double distance = 10; // km
     // coordinates in decimal degrees, +/- to specify bearing, up to 7 decimal places, ranged
     // see http://www.regexlib.com/REDetails.aspx?regexp_id=1535
-    private EditText latitude; // ^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,7}
+    private double latitude; // ^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,7}
     // see http://www.regexlib.com/REDetails.aspx?regexp_id=1536
-    private EditText longitude; // ^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,7}
+    private double longitude; // ^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,7}
+
     private EditText name;
     private EditText description;
     private EditText code;
@@ -74,15 +79,10 @@ public class AddGeocacheActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_geocache);
 
-        // map! todo: fixme
-        //setUpMapIfNeeded();
-        //locationProvider = new LocationProvider(this, this);
-        // give the user the ability to choose location on the map.
-        // figure it out!!
+        // map including default latitude and longitude
+        setUpMap();
 
         // context controls
-        latitude = (EditText) findViewById(R.id.latitude);
-        longitude = (EditText) findViewById(R.id.longitude);
         name = (EditText) findViewById(R.id.name);
         description = (EditText) findViewById(R.id.description);
         code = (EditText) findViewById(R.id.code);
@@ -126,101 +126,181 @@ public class AddGeocacheActivity extends FragmentActivity
         dialog.show();*/
     }
 
-    // todo: fixme
-    //@Override
-    /*protected void onResume() {
-        super.onResume();
-        setUpMapIfNeeded();
-        locationProvider.connect();
-    }*/
-
     @Override
-    protected void onPause() {
-        super.onPause();
-        locationProvider.disconnect();
-    }
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_LOCATION_PERMISSION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setUpMap();
+                } else {
 
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #map} is not null.
-     * <p>
-     * If it isn't installed {@link com.google.android.gms.maps.SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-     * install/update the Google Play services APK on their device.
-     * <p>
-     * A user can return to this FragmentActivity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-     * have been completely destroyed during this process (it is likely that it would only be
-     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
-     * method in {@link #onResume()} to guarantee that it will be called.
-     */
-    /*private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (map == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
-            // Check if we were successful in obtaining the map.
-            if (map != null) {
-                setUpMap();
+                }
             }
         }
-    }*/
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p>
-     * This should only be called once and when we are sure that {@link #map} is not null.
-     */
-    private void setUpMap() {
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-        Log.d(TAG, "setUpMap()");
-        map.setMyLocationEnabled(true);
-        map.getUiSettings().setMyLocationButtonEnabled(true);
     }
 
-    @Override
+    public void setUpMap() {
+        // Getting Google Play availability status
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
+        // Showing status
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are not available
+            int requestCode = 10;
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, requestCode);
+            dialog.show();
+        } else {  // Google Play Services are available
+            // Getting reference to the SupportMapFragment of activity_main.xml
+            SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+            // Getting GoogleMap object from the fragment
+            map = fm.getMap();
+            // Enable MyLocation of the Google Map
+            map.setMyLocationEnabled(true);
+            // Enable the Zoom Controls of the Google Map
+            map.getUiSettings().setZoomControlsEnabled(true);
+            // Getting LocationManager object from System Service LOCATION_SERVICE
+            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            // Creating a criteria object to retrieve provider
+            Criteria criteria = new Criteria();
+            // Getting the name of the best provider
+            String provider = locationManager.getBestProvider(criteria, true);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                // Getting Current Location
+                Location location = locationManager.getLastKnownLocation(provider);
+                if (location != null) {
+                    onLocationChanged(location);
+                }
+                locationManager.requestLocationUpdates(provider, 20000, 0, this);
+            }
+        }
+    }
+
     public void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
-
-        blueharvest.geocaching.util.GeoLocation[] b
-                = blueharvest.geocaching.util.GeoLocation.fromDegrees(
-                location.getLatitude(), location.getLongitude())
-                .boundingCoordinates(distance, 6371.01); // distance & earth's radius in km
-        LatLngBounds here = new LatLngBounds(
-                new LatLng(b[0].getLatitudeInDegrees(), b[0].getLongitudeInDegrees()),
-                new LatLng(b[1].getLatitudeInDegrees(), b[1].getLongitudeInDegrees()));
-        // Set the camera to the greatest possible zoom level that includes the bounds
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(here, 0));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(here.getCenter(), 10));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        //mMap.animateCamera(CameraUpdateFactory.zoomTo(13.0f)); // lower = further out
-
-        Circle circle = map.addCircle(new CircleOptions()
-                .center(here.getCenter())
-                        // http://www.rapidtables.com/web/color/RGB_Color.htm
-                .fillColor(Color.argb(0x55, 0xd2, 0xb4, 0x8c)) // 85, 210, 180, 140
-                .strokeColor(Color.argb(0xaa, 0xd2, 0xb4, 0x8c)) // 170, 210, 180, 140
-                .radius(distance * 1000) // meters (distance is km)
-                .strokeWidth(3f)); // pixels
-
-        // current location marker
-        MarkerOptions options = new MarkerOptions()
+        // Showing the current location in Google Map
+        map.moveCamera(CameraUpdateFactory.newLatLng(
+                new LatLng(location.getLatitude(), location.getLongitude())));
+        // Zoom in the Google Map
+        map.animateCamera(CameraUpdateFactory.zoomTo(15));
+        // Geocache Latitude and Longitude
+        ((EditText) findViewById(R.id.latitude)).setText(String.valueOf(
+                new java.text.DecimalFormat("##0.#######").format(location.getLatitude())));
+        ((EditText) findViewById(R.id.longitude)).setText(String.valueOf(
+                new java.text.DecimalFormat("##0.#######").format(location.getLongitude())));
+        // Current location marker
+        map.addMarker(new MarkerOptions()
                 .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                .title("I am here!"); // todo: change title
-        map.addMarker(options);
-
-        new GeocachesTask().execute(location);
-        if (geocaches != null) { // null check
-            for (blueharvest.geocaching.soap.objects.geocache g : geocaches) {
-                map.addMarker(new MarkerOptions().position(
-                        new LatLng(g.getLocation().getLatitude().getDecimalDegrees(),
-                                g.getLocation().getLongitude().getDecimalDegrees()))
-                        .title(g.getName()));
+                .draggable(true)
+                .title("New Geocache Marker!"));
+        map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
             }
-        }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                ((EditText) findViewById(R.id.latitude)).setText(String.valueOf(
+                        new java.text.DecimalFormat("##0.#######").format(
+                                marker.getPosition().latitude)));
+                ((EditText) findViewById(R.id.longitude)).setText(String.valueOf(
+                        new java.text.DecimalFormat("##0.#######").format(
+                                marker.getPosition().longitude)));
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+            }
+        });
+
+        //blueharvest.geocaching.util.GeoLocation[] b
+        //        = blueharvest.geocaching.util.GeoLocation.fromDegrees(
+        //        location.getLatitude(), location.getLongitude())
+        //        .boundingCoordinates(distance, 6371.01); // distance & earth's radius in km
+        //LatLngBounds here = new LatLngBounds(
+        //        new LatLng(b[0].getLatitudeInDegrees(), b[0].getLongitudeInDegrees()),
+        //        new LatLng(b[1].getLatitudeInDegrees(), b[1].getLongitudeInDegrees()));
+        // Set the camera to the greatest possible zoom level that includes the bounds
+        //map.moveCamera(CameraUpdateFactory.newLatLngBounds(here, 0));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(here.getCenter(), 10));
+
+        //Circle circle = map.addCircle(new CircleOptions()
+        //        .center(here.getCenter())
+        //                // http://www.rapidtables.com/web/color/RGB_Color.htm
+        //        .fillColor(Color.argb(0x55, 0xd2, 0xb4, 0x8c)) // 85, 210, 180, 140
+        //        .strokeColor(Color.argb(0xaa, 0xd2, 0xb4, 0x8c)) // 170, 210, 180, 140
+        //        .radius(distance * 1000) // meters (distance is km)
+        //        .strokeWidth(3f)); // pixels
+
+        //new GeocachesTask().execute(location);
+        //if (geocaches != null) { // null check
+        //    for (blueharvest.geocaching.soap.objects.geocache g : geocaches) {
+        //        map.addMarker(new MarkerOptions().position(
+        //                new LatLng(g.getLocation().getLatitude().getDecimalDegrees(),
+        //                        g.getLocation().getLongitude().getDecimalDegrees()))
+        //                .title(g.getName()));
+        //    }
+        //}
+    }
+
+    /**
+     * Called when the location has changed.
+     * <p>
+     * <p> There are no restrictions on the use of the supplied Location object.
+     *
+     * @param location The new location, as a Location object.
+     */
+    @Override
+    public void onLocationChanged(Location location) {
+        handleNewLocation(location);
+    }
+
+    /**
+     * Called when the provider status changes. This method is called when
+     * a provider is unable to fetch a location or if the provider has recently
+     * become available after a period of unavailability.
+     *
+     * @param provider the name of the location provider associated with this
+     *                 update.
+     * @param status   {@link com.blueharvest.geocaching.LocationProvider#OUT_OF_SERVICE} if the
+     *                 provider is out of service, and this is not expected to change in the
+     *                 near future; {@link com.blueharvest.geocaching.LocationProvider#TEMPORARILY_UNAVAILABLE} if
+     *                 the provider is temporarily unavailable but is expected to be available
+     *                 shortly; and {@link com.blueharvest.geocaching.LocationProvider#AVAILABLE} if the
+     *                 provider is currently available.
+     * @param extras   an optional Bundle which will contain provider specific
+     *                 status variables.
+     *                 <p>
+     *                 <p> A number of common key/value pairs for the extras Bundle are listed
+     *                 below. Providers that use any of the keys on this list must
+     *                 provide the corresponding value as described below.
+     *                 <p>
+     *                 <ul>
+     *                 <li> satellites - the number of satellites used to derive the fix
+     */
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    /**
+     * Called when the provider is enabled by the user.
+     *
+     * @param provider the name of the location provider associated with this
+     *                 update.
+     */
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    /**
+     * Called when the provider is disabled by the user. If requestLocationUpdates
+     * is called on an already disabled provider, this method is called
+     * immediately.
+     *
+     * @param provider the name of the location provider associated with this
+     *                 update.
+     */
+    public void onProviderDisabled(String provider) {
+
     }
 
     /**
