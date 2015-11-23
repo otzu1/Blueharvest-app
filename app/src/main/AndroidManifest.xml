@@ -77,6 +77,8 @@
 
         <activity android:name=".ViewGeocacheActivity" >
         </activity>
+        <activity android:name=".AddLogbookEntryActivity" >
+        </activity>
     </application>
 
 </manifest>

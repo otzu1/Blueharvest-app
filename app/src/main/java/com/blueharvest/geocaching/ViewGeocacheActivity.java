@@ -1,18 +1,28 @@
 package com.blueharvest.geocaching;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.InputStream;
+import java.net.URL;
 
 import blueharvest.geocaching.concepts.location;
 
@@ -21,6 +31,18 @@ import blueharvest.geocaching.concepts.location;
  * View of a geocache with a map to of the latitude and longitude coordinates. The geocache
  * attributes are all shown on this activity. The "code" message MUST be sent from the
  * preceding activity to function properly ... without it, the activity will fail.
+ * The favorite control is shown with a filled star when the user has "favorited" the geocache
+ * and unfilled when the geocache is not a favorite of the user. The display is similar when the
+ * user has indicated the geocache was already found or not depending in whether the "found"
+ * circle is filled or not. The avatar (if available) is displayed for the user responsible
+ * for creating the geocache and the anniversary date in which the geocache was created.
+ * The user has the option to log the geocache from this activity from a stationary "log" button.
+ * The layout above the log button scrolls with room to spare at the bottom to avoid blocking the
+ * geocache information.
+ * <p>
+ * todo: send intent message to a log activity
+ * todo: send intent to view all logs of this geocache
+ * todo: get current location to display the distance to the geocache (requires LocationListener)
  *
  * @since 2015-11-22
  */
@@ -48,16 +70,16 @@ public class ViewGeocacheActivity extends FragmentActivity {
         //new GeocacheTask().execute(getIntent().getStringExtra("code"));
         new GeocacheTask().execute("BH13GC7");
 
-        // save button with click listener
-        /*Button save = (Button) findViewById(R.id.save);
-        save.setOnClickListener(new View.OnClickListener() {
+        // log button with click listener
+        Button log = (Button) findViewById(R.id.log);
+        log.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // todo: do something
+                Intent intent = new Intent(ViewGeocacheActivity.this, AddLogbookEntryActivity.class);
+                intent.putExtra("geocacheid", ((TextView) findViewById(R.id.id)).getText().toString());
+                startActivity(intent);
             }
-        });*/
-        /*Dialog dialog = GooglePlayServicesUtil.getErrorDialog(0, this, 0);
-        dialog.show();*/
+        });
     }
 
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
@@ -85,6 +107,7 @@ public class ViewGeocacheActivity extends FragmentActivity {
 
     /**
      * leaving this here in case we ever want to show neighboring geocaches
+     *
      * @see <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsycncTask</a>
      * Params, Progress, Result
      * @since 2015-11-20
@@ -137,11 +160,17 @@ public class ViewGeocacheActivity extends FragmentActivity {
         private blueharvest.geocaching.concepts.geocache g;
 
         protected Void doInBackground(String... params) {
-            Log.d(TAG, params[0] + " was sent to the background task");
+            //Log.d(TAG, params[0] + " was sent to the background task");
             g = blueharvest.geocaching.soap.objects.geocache.get(params[0]);
             return null;
         }
 
+        /**
+         * Sets up the map and widgets on this Activity from the
+         * geocache object fetched from doInBackground
+         *
+         * @param result
+         */
         @Override
         protected void onPostExecute(Void result) {
             map.moveCamera(CameraUpdateFactory.newLatLng(
@@ -149,21 +178,98 @@ public class ViewGeocacheActivity extends FragmentActivity {
                             g.getLocation().getLongitude().getDecimalDegrees())));
             // Zoom in the Google Map
             map.animateCamera(CameraUpdateFactory.zoomTo(15));
-            // Geocache Latitude and Longitude
-            // Current location marker
+            // Geocache location marker with name
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(g.getLocation().getLatitude().getDecimalDegrees(),
                             g.getLocation().getLongitude().getDecimalDegrees()))
                     .title(g.getName()));
-            /*((EditText) findViewById(R.id.latitude)).setText(
+            // set up widgets
+            ((TextView) findViewById(R.id.latitude)).setText(
                     g.getLocation().getLatitude().toSexigesimal(
                             location.coordinate.type.latitude));
-            ((EditText) findViewById(R.id.longitude)).setText(
+            ((TextView) findViewById(R.id.longitude)).setText(
                     g.getLocation().getLongitude().toSexigesimal(
-                            location.coordinate.type.longitude));*/
+                            location.coordinate.type.longitude));
+            ((TextView) findViewById(R.id.name)).setText(g.getName());
+            ((TextView) findViewById(R.id.code)).setText(g.getCode());
+            ((TextView) findViewById(R.id.type)).setText(
+                    getResources().getStringArray(R.array.geocache_types)[g.getType()]);
+            ((TextView) findViewById(R.id.size)).setText(
+                    getResources().getStringArray(R.array.geocache_sizes)[g.getType()]);
+            ((TextView) findViewById(R.id.terrain)).setText(
+                    getResources().getStringArray(R.array.geocache_terrain)[g.getType()]);
+            ((TextView) findViewById(R.id.difficulty)).setText(
+                    getResources().getStringArray(R.array.geocache_difficulty)[g.getType()]);
+            // todo: fade out long descriptions and offer a button to "read more"
+            ((TextView) findViewById(R.id.description)).setText(g.getDescription());
+            // todo: creator image (avatar)
+            if (g.getCreator().getImage() != null && g.getCreator().getImage().getUri() != null) {
+                 /* Download the image from online and set it as ImageView image programmatically. */
+                //Log.d(TAG, g.getCreator().getImage().getUri().toString());
+                new DownloadUserImageTask(((ImageView) findViewById(R.id.creator_image))).execute(
+                        g.getCreator().getImage().getUri().toString());
+            }
+            ((TextView) findViewById(R.id.creator)).setText("Placed by: " + g.getCreator().getUsername());
+            // todo: format anniversary
+            ((TextView) findViewById(R.id.anniversary)).setText(g.getAnniversary().toString());
+            ((TextView) findViewById(R.id.id)).setText(g.getId().toString());
         }
 
     }
 
+    /**
+     * todo: this code is here for when we implement user images
+     *
+     * @see <a href="http://android--code.blogspot.com/2015/08/android-imageview-set-image-from-url.html">
+     * How to set ImageView image from URL in Android</a>
+     * @since 2015-11-23
+     */
+    private class DownloadUserImageTask extends AsyncTask<String, Void, Bitmap> {
+
+        ImageView imageView;
+
+        public DownloadUserImageTask(ImageView imageView) {
+            this.imageView = imageView;
+        }
+
+        /**
+         * Override this method to perform a computation on a background thread. The
+         * specified parameters are the parameters passed to {@link #execute}
+         * by the caller of this task.
+         * <p>
+         * This method can call {@link #publishProgress} to publish updates
+         * on the UI thread.
+         *
+         * @param params The parameters of the task.
+         * @return A result, defined by the subclass of this task.
+         * @see #onPreExecute()
+         * @see #onPostExecute
+         * @see #publishProgress
+         */
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            Bitmap r = null;
+            try {
+                InputStream is = new URL(params[0]).openStream();
+                /* decode an input stream into a bitmap */
+                r = BitmapFactory.decodeStream(is);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return r;
+        }
+
+        /**
+         * onPostExecute(Result result)
+         * Runs on the UI thread after doInBackground(Params...)
+         *
+         * @param result
+         */
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            imageView.setImageBitmap(result);
+        }
+
+    }
 
 }
