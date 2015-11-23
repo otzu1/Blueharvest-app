@@ -113,12 +113,18 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
                 if (me != null) {
                     // wrap the controls in a geocache object and
                     // send it to the background thread to add the geocache
-                    new AddGeocacheTask().execute(Geocache(java.util.UUID.fromString(me)));
-                    startActivity(new Intent(AddGeocacheActivity.this, ViewGeocacheActivity.class));
+                    // todo: uncomment this!
+                    //new AddGeocacheTask().execute(Geocache(java.util.UUID.fromString(me)));
+                    //startActivity(new Intent(AddGeocacheActivity.this, ViewGeocacheActivity.class));
+                    // http://developer.android.com/training/basics/firstapp/starting-activity.html
+                    Intent intent = new Intent(AddGeocacheActivity.this, ViewGeocacheActivity.class);
+                    // todo: don't forget to change this!
+                    //intent.putExtra("code", ((EditText) findViewById(R.id.code)).getText().toString());
+                    intent.putExtra("code", "GEOhohoho"); // todo: change this!!
+                    startActivity(intent);
                     // todo: handle problems with insert
                     /*if (the-insert-is-false) {
-                        // todo: take the user to see the newly added geocache
-                        startActivity(new Intent(AddGeocacheActivity.this, ViewGeocacheActivity.class));
+                        // todo: take the user to see the newly added geocache like above
                     } else {
                         // todo: do something, there's a problem
                     }*/
