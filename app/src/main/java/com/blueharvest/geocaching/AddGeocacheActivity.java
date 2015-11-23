@@ -2,7 +2,6 @@ package com.blueharvest.geocaching;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -28,7 +27,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-
 /**
  * Add Geocache Activity<br>
  * Creates a new geocache with a map to choose latitude and longitude coordinates, defaults
@@ -42,7 +40,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * a suggested random code (blueharvest-0.0.3+ required). Spinner controls are used for enumerating
  * values for size, terrain, and difficulty. The values for the enumerations are found hard-coded
  * in each respective .xml resource file in a string array and accessible through an adapter.
- * <p>
+ * <p/>
  * Eventually, this activity is to direct the user to the geocache details page not yet started.
  *
  * @see <a href="http://developer.android.com/guide/topics/ui/controls/spinner.html">
@@ -113,21 +111,16 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
                 if (me != null) {
                     // wrap the controls in a geocache object and
                     // send it to the background thread to add the geocache
-                    // todo: uncomment this!
-                    //new AddGeocacheTask().execute(Geocache(java.util.UUID.fromString(me)));
-                    //startActivity(new Intent(AddGeocacheActivity.this, ViewGeocacheActivity.class));
-                    // http://developer.android.com/training/basics/firstapp/starting-activity.html
-                    Intent intent = new Intent(AddGeocacheActivity.this, ViewGeocacheActivity.class);
-                    // todo: don't forget to change this!
-                    //intent.putExtra("code", ((EditText) findViewById(R.id.code)).getText().toString());
-                    intent.putExtra("code", "GEOhohoho"); // todo: change this!!
-                    startActivity(intent);
+                    new AddGeocacheTask().execute(Geocache(java.util.UUID.fromString(me)));
                     // todo: handle problems with insert
-                    /*if (the-insert-is-false) {
-                        // todo: take the user to see the newly added geocache like above
-                    } else {
+                    /*if (the-insert-failed) {
                         // todo: do something, there's a problem
+                    } else {
+                        // todo: take the user to see the newly added geocache (like below)
                     }*/
+                    Intent intent = new Intent(AddGeocacheActivity.this, ViewGeocacheActivity.class);
+                    intent.putExtra("code", ((EditText) findViewById(R.id.code)).getText().toString());
+                    startActivity(intent);
                 } else {
                     // todo: something more elegant for the user
                     System.out.println("me is null. help!");
@@ -286,7 +279,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
 
     /**
      * Called when the location has changed.
-     * <p>
+     * <p/>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.
@@ -311,11 +304,11 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
      *                 provider is currently available.
      * @param extras   an optional Bundle which will contain provider specific
      *                 status variables.
-     *                 <p>
+     *                 <p/>
      *                 <p> A number of common key/value pairs for the extras Bundle are listed
      *                 below. Providers that use any of the keys on this list must
      *                 provide the corresponding value as described below.
-     *                 <p>
+     *                 <p/>
      *                 <ul>
      *                 <li> satellites - the number of satellites used to derive the fix
      */
@@ -356,7 +349,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
          * Override this method to perform a computation on a background thread. The
          * specified parameters are the parameters passed to {@link #execute}
          * by the caller of this task.
-         * <p>
+         * <p/>
          * This method can call {@link #publishProgress} to publish updates
          * on the UI thread.
          *
@@ -394,7 +387,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
          * Override this method to perform a computation on a background thread. The
          * specified parameters are the parameters passed to {@link #execute}
          * by the caller of this task.
-         * <p>
+         * <p/>
          * This method can call {@link #publishProgress} to publish updates
          * on the UI thread.
          *

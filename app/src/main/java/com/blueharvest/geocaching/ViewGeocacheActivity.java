@@ -8,10 +8,9 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -70,18 +69,38 @@ public class ViewGeocacheActivity extends FragmentActivity {
         //new GeocacheTask().execute(getIntent().getStringExtra("code"));
         new GeocacheTask().execute("BH13GC7");
 
+        // favorite button with click listener
+        ImageButton favorite = (ImageButton) findViewById(R.id.favorite);
+        favorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // todo: do something here
+            }
+        });
+
+        // found button with click listener
+        ImageButton found = (ImageButton) findViewById(R.id.found);
+        found.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // todo: do something here
+            }
+        });
+
         // log button with click listener
         Button log = (Button) findViewById(R.id.log);
         log.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ViewGeocacheActivity.this, AddLogbookEntryActivity.class);
-                intent.putExtra("geocacheid", ((TextView) findViewById(R.id.id)).getText().toString());
+                intent.putExtra("logbookid", ((TextView) findViewById(R.id.geocacheid)).getText().toString());
+                intent.putExtra("code", ((TextView) findViewById(R.id.code)).getText().toString());
                 startActivity(intent);
             }
         });
     }
 
+    @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_LOCATION_PERMISSION: {
@@ -212,7 +231,8 @@ public class ViewGeocacheActivity extends FragmentActivity {
             ((TextView) findViewById(R.id.creator)).setText("Placed by: " + g.getCreator().getUsername());
             // todo: format anniversary
             ((TextView) findViewById(R.id.anniversary)).setText(g.getAnniversary().toString());
-            ((TextView) findViewById(R.id.id)).setText(g.getId().toString());
+            ((TextView) findViewById(R.id.geocacheid)).setText(g.getId().toString());
+            ((TextView) findViewById(R.id.logbookid)).setText(g.getLogbook().getId().toString());
         }
 
     }
