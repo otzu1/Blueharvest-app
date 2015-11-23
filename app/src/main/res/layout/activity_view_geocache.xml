@@ -34,7 +34,6 @@
                     android:id="@+id/map"
                     android:name="com.google.android.gms.maps.SupportMapFragment"
                     xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:map="http://schemas.android.com/apk/res-auto"
                     xmlns:tools="http://schemas.android.com/tools"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -62,7 +61,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:contentDescription="@string/view_geocache_found_on"
-                        android:src="@drawable/ic_radio_button_on_24dp"/>
+                        android:src="@drawable/ic_check_box_24dp"/>
                 </TableRow>
 
             </RelativeLayout>
@@ -181,6 +180,7 @@
                     android:layout_height="99dp"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
+                    android:contentDescription="@string/view_geocache_creator_image"
                     android:src="@drawable/portrait_placeholder"/>
 
             </RelativeLayout>
@@ -189,8 +189,6 @@
                 android:id="@+id/creator"
                 android:layout_width="match_parent"
                 android:layout_height="35dp"
-                android:layout_below="@+id/log"
-                android:layout_centerHorizontal="true"
                 android:gravity="center"
                 android:text="creator"
                 android:textAppearance="?android:attr/textAppearanceMedium"/>
@@ -209,18 +207,25 @@
 
                 <Space
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    />
+                    android:layout_height="match_parent"/>
 
             </TableRow>
+
+            <TextView
+                android:id="@+id/geocacheid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:foreground="#f4efef"
+                android:text="geocacheid"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="id"
-                android:id="@+id/id"
-                android:foreground="#f4efef"/>
+                android:text="logbookid"
+                android:id="@+id/logbookid"
+                android:foreground="#fff"/>
 
         </LinearLayout>
     </ScrollView>
