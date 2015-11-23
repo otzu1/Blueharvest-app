@@ -32,4 +32,7 @@
     <string name="add_geocache_latitude">Latitude</string>
     <string name="add_geocache_longitude">Longitude</string>
     <string name="add_geocache_save">Save</string>
+    <string name="view_geocache_log">Enter a Log</string>
+    <string name="view_geocache_favorite_off">favorite</string>
+    <string name="view_geocache_found_on">found</string>
 </resources>
