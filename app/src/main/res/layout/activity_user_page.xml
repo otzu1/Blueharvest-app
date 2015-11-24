@@ -100,7 +100,8 @@
             android:layout_height="wrap_content"
             android:text="Search"
             android:id="@+id/buttonSearch"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:onClick="searchGeocache"/>
 
         <LinearLayout
             android:orientation="horizontal"
