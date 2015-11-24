@@ -41,7 +41,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * values for size, terrain, and difficulty. The values for the enumerations are found hard-coded
  * in each respective .xml resource file in a string array and accessible through an adapter.
  * <p/>
- * Eventually, this activity is to direct the user to the geocache details page not yet started.
+ * This activity then directs the usee to the view geocache activity.
+ * todo: validation, handle no location, etc.
  *
  * @see <a href="http://developer.android.com/guide/topics/ui/controls/spinner.html">
  * Populate the Spinner with User Choices</a>
