@@ -1,7 +1,6 @@
 package com.blueharvest.geocaching;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -23,28 +22,26 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-public class user_home_page extends AppCompatActivity implements
-        LocationListener {
+public class user_home_page extends AppCompatActivity implements LocationListener {
 
     private GoogleMap mMap;
     private final static int MY_LOCATION_PERMISSION = 1;
-    private double distance = 0.0;
+    private double distance = 10; // km
 
     private SearchTask mSearchTask = null;
-
 
     private static final String logCat = "user home page";
     blueharvest.geocaching.soap.objects.geocache.geocaches results;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_home_page);
+        //setContentView(R.layout.activity_user_home_page);
+
+        Log.d("blueharvest", "user_home_page.java");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -86,7 +83,8 @@ public class user_home_page extends AppCompatActivity implements
         Location center = new Location ("New");
         center.setLatitude(searchLat);
         center.setLongitude(searchLon);
-        mSearchTask = new SearchTask(center);
+        //mSearchTask = new SearchTask(center);
+        new SearchTask().execute(center);
 
     }
 
@@ -111,6 +109,7 @@ public class user_home_page extends AppCompatActivity implements
     }
 
     public void setupMap() {
+        Log.d(logCat, "setupMap");
         // Getting Google Play availability status
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
 
@@ -197,18 +196,20 @@ public class user_home_page extends AppCompatActivity implements
      */
     public class SearchTask extends AsyncTask<Location, Void, Void> {
 
-        public SearchTask(Location center) {
+        // jmb: added private object for onpostexecute 2015-11-24
+        private blueharvest.geocaching.soap.objects.geocache.geocaches gs;
 
-        }
+        /*public SearchTask(Location center) {
+
+        }*/
 
         @Override
         protected Void doInBackground(Location... locations) {
-
             for (int i = 0; i < locations.length; i++) { // should only be one
                 double myLatitude = locations[i].getLatitude();
                 double myLongitude = locations[i].getLongitude();
                 // get the geocaches from around the location coordinates here
-                results = new blueharvest.geocaching.soap.objects.geocache.geocaches(
+                gs = new blueharvest.geocaching.soap.objects.geocache.geocaches(
                         myLatitude, myLongitude, distance);
             }
             return null;
@@ -217,8 +218,7 @@ public class user_home_page extends AppCompatActivity implements
         @Override
         protected void onPostExecute(Void result) {
             // Generate the markers on the map
-            for(blueharvest.geocaching.soap.objects.geocache geocache : results) {
-
+            for(blueharvest.geocaching.soap.objects.geocache geocache : gs) {
                 Marker marker = mMap.addMarker(new MarkerOptions()
                         .position(new LatLng(geocache.getLocation().getLatitude().getDecimalDegrees(),
                                 geocache.getLocation().getLongitude().getDecimalDegrees()))
