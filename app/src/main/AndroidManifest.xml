@@ -73,6 +73,11 @@
             android:name=".AddLogbookEntryActivity"
             android:label="Add Logbook Entry" >
         </activity>
+        <activity
+            android:name=".user_page"
+            android:label="@string/title_activity_user_page"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
