@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,6 +37,7 @@ public class user_page extends AppCompatActivity implements LocationListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_page);
+        Log.d("blueharvest", "user_page.java");
 
         mLatitude = (EditText) findViewById(R.id.latitude);
         mLongitude = (EditText) findViewById(R.id.longitude);
@@ -44,12 +46,13 @@ public class user_page extends AppCompatActivity implements LocationListener {
         View mMapView = findViewById(R.id.mapParent);
 
         Button mSearch = (Button) findViewById(R.id.buttonSearch);
-        //mSearch.setOnClickListener(new View.OnClickListener() {
-            //@Override
-            //public void onClick(View view) {
+        mSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("blueharvest", "search button clicked");
                 //searchGeocache();
-            //}
-        //});
+            }
+        });
 
         Button mAddGeocache = (Button) findViewById(R.id.buttonAddGeo);
         mAddGeocache.setOnClickListener(new View.OnClickListener() {
@@ -151,6 +154,7 @@ public class user_page extends AppCompatActivity implements LocationListener {
     }
 
     protected void searchGeocache() {
+        Log.d("blueharvest", "searchGeocache called");
         Intent searchIntent = new Intent(user_page.this, user_home_page.class);
         Double searchRad = Double.parseDouble(mSearchRad.getText().toString());
         Double searchLat = Double.parseDouble(mLatitude.getText().toString());
@@ -163,6 +167,7 @@ public class user_page extends AppCompatActivity implements LocationListener {
     }
 
     protected void addGeocache() {
+        Log.d("blueharvest", "addGeocache called");
         finish();
         startActivity(new Intent(user_page.this, AddGeocacheActivity.class));
     }
