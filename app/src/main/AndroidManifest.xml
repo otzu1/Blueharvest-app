@@ -75,6 +75,11 @@
 
         <activity android:name=".AddGeocacheActivity" >
         </activity>
+        <activity
+            android:name=".user_page"
+            android:label="@string/title_activity_user_page"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
     </application>
 
 </manifest>
