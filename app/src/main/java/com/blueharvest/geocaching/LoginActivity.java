@@ -7,6 +7,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -296,9 +297,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Boolean doInBackground(Void... params) {
             boolean success = false;
 
-            // here's an example of how to auth a user.
-            // check logcat for the result :)
-            System.out.println("testing here ... ");
             try {
                 success =
                         blueharvest.geocaching.soap.objects.user.auth(mUsername, mPassword);
@@ -306,6 +304,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 System.out.println(e.getMessage());
             }
 
+            // if the user logs in, save/confirm an identifier for other features they may use
+            // we won't waste our time otherwise and only if they are auth'ed
+            if (success) {
+                String me = blueharvest.geocaching.soap.objects.user.get(
+                        mUsername, mPassword).getId().toString();
+                SharedPreferences pref // 0 - for private mode
+                        = getApplicationContext().getSharedPreferences("blueharvest", 0);
+                SharedPreferences.Editor editor = pref.edit();
+                // instead of checking if an identifier exists and all that jazz,
+                // we'll just clear the preference (that one only)
+                // and add the currently auth'ed to exist.
+                editor.remove("me");
+                editor.apply();
+                editor.putString("me", me);
+                editor.apply();
+            }
 
             return success;
         }

@@ -32,5 +32,12 @@
     <string name="add_geocache_latitude">Latitude</string>
     <string name="add_geocache_longitude">Longitude</string>
     <string name="add_geocache_save">Save</string>
+    <string name="view_geocache_log">Enter a Log</string>
+    <string name="view_geocache_favorite_off">favorite</string>
+    <string name="view_geocache_found_on">found</string>
+    <string name="view_geocache_creator_image">creator image</string>
+    <string name="add_logbook_entry_text">Enter the logbook entry text here.</string>
+    <string name="add_logbook_entry_title">Title</string>
+    <string name="add_logbook_entry_save">Save</string>
     <string name="title_activity_user_page">user_page</string>
 </resources>
