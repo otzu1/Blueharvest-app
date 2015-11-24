@@ -44,12 +44,12 @@ public class user_page extends AppCompatActivity implements LocationListener {
         View mMapView = findViewById(R.id.mapParent);
 
         Button mSearch = (Button) findViewById(R.id.buttonSearch);
-        mSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                searchGeocache();
-            }
-        });
+        //mSearch.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            //public void onClick(View view) {
+                //searchGeocache();
+            //}
+        //});
 
         Button mAddGeocache = (Button) findViewById(R.id.buttonAddGeo);
         mAddGeocache.setOnClickListener(new View.OnClickListener() {
@@ -151,7 +151,6 @@ public class user_page extends AppCompatActivity implements LocationListener {
     }
 
     protected void searchGeocache() {
-        finish();
         Intent searchIntent = new Intent(user_page.this, user_home_page.class);
         Double searchRad = Double.parseDouble(mSearchRad.getText().toString());
         Double searchLat = Double.parseDouble(mLatitude.getText().toString());
@@ -160,6 +159,7 @@ public class user_page extends AppCompatActivity implements LocationListener {
         searchIntent.putExtra("SearchLat", searchLat);
         searchIntent.putExtra("SearchLong", searchLong);
         startActivity(searchIntent);
+        finish();
     }
 
     protected void addGeocache() {

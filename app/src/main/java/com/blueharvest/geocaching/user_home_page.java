@@ -1,11 +1,13 @@
 package com.blueharvest.geocaching;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -30,10 +32,13 @@ public class user_home_page extends AppCompatActivity implements
 
     private GoogleMap mMap;
     private final static int MY_LOCATION_PERMISSION = 1;
-    private double currentLat = 0.0;
-    private double currentLong = 0.0;
+    private double distance = 0.0;
+
+    private SearchTask mSearchTask = null;
+
 
     private static final String logCat = "user home page";
+    blueharvest.geocaching.soap.objects.geocache.geocaches results;
 
 
     @Override
@@ -46,7 +51,7 @@ public class user_home_page extends AppCompatActivity implements
 
         Double searchRadius = getIntent().getDoubleExtra("SearchRad", 0.00);
         Double searchLat = getIntent().getDoubleExtra("SearchLat", 0.00);
-        Double searchLong = getIntent().getDoubleExtra("SearchLong", 0.00);
+        Double searchLon = getIntent().getDoubleExtra("SearchLon", 0.00);
 
         View mMapView = findViewById(R.id.user_home_content_form);
 
@@ -78,16 +83,10 @@ public class user_home_page extends AppCompatActivity implements
             }
         }
 
-        blueharvest.geocaching.soap.objects.geocache.geocaches searchResults = searchTask(searchLat, searchLong, searchRadius);
-
-        // Generate the markers on the map
-        for(blueharvest.geocaching.soap.objects.geocache geocache : searchResults) {
-
-            Marker marker = mMap.addMarker(new MarkerOptions()
-            .position(new LatLng(geocache.getLocation().getLatitude().getDecimalDegrees(), geocache.getLocation().getLongitude().getDecimalDegrees()))
-            .title(geocache.getName())
-            .snippet(geocache.getCode()));
-        }
+        Location center = new Location ("New");
+        center.setLatitude(searchLat);
+        center.setLongitude(searchLon);
+        mSearchTask = new SearchTask(center);
 
     }
 
@@ -162,11 +161,9 @@ public class user_home_page extends AppCompatActivity implements
 
         // Getting latitude of the current location
         double latitude = location.getLatitude();
-        currentLat = latitude;
 
         // Getting longitude of the current location
         double longitude = location.getLongitude();
-        currentLong = longitude;
 
         // Creating a LatLng object for the current location
         LatLng latLng = new LatLng(latitude, longitude);
@@ -194,19 +191,46 @@ public class user_home_page extends AppCompatActivity implements
 
     }
 
-    protected blueharvest.geocaching.soap.objects.geocache.geocaches searchTask(Double lat, Double lon, Double radius) {
+    /**
+     * Represents an asynchronous login/registration task used to authenticate
+     * the user.
+     */
+    public class SearchTask extends AsyncTask<Location, Void, Void> {
 
-        try {
-            blueharvest.geocaching.soap.objects.geocache.geocaches results =
-                    new blueharvest.geocaching.soap.objects.geocache.geocaches(lat, lon, radius);
-            return results;
-        }
-        catch (Exception e) {
-            Log.d(logCat, "Error Getting Geocaches");
-            return new blueharvest.geocaching.soap.objects.geocache.geocaches(0.0, 0.0, 0.0);
+        public SearchTask(Location center) {
+
         }
 
+        @Override
+        protected Void doInBackground(Location... locations) {
 
+            for (int i = 0; i < locations.length; i++) { // should only be one
+                double myLatitude = locations[i].getLatitude();
+                double myLongitude = locations[i].getLongitude();
+                // get the geocaches from around the location coordinates here
+                results = new blueharvest.geocaching.soap.objects.geocache.geocaches(
+                        myLatitude, myLongitude, distance);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // Generate the markers on the map
+            for(blueharvest.geocaching.soap.objects.geocache geocache : results) {
+
+                Marker marker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(geocache.getLocation().getLatitude().getDecimalDegrees(),
+                                geocache.getLocation().getLongitude().getDecimalDegrees()))
+                        .title(geocache.getName())
+                        .snippet(geocache.getCode()));
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mSearchTask = null;
+        }
     }
 
 
