@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.blueharvest.geocaching"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    package="com.blueharvest.geocaching"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -48,7 +49,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login">
@@ -58,6 +58,10 @@
         <activity
             android:name=".MainActivity"
             android:label="Main">
+        </activity>
+        <activity
+            android:name=".user_page"
+            android:label="@string/title_activity_user_page">
         </activity>
         <activity
             android:name=".user_home_page"
@@ -74,8 +78,8 @@
             android:label="Add Logbook Entry">
         </activity>
         <activity
-            android:name=".user_page"
-            android:label="@string/title_activity_user_page">
+            android:name=".HelpActivity"
+            android:label="Help">
         </activity>
 
         <!--
