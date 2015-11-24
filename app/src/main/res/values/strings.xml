@@ -39,4 +39,5 @@
     <string name="add_logbook_entry_text">Enter the logbook entry text here.</string>
     <string name="add_logbook_entry_title">Title</string>
     <string name="add_logbook_entry_save">Save</string>
+    <string name="title_activity_user_page">user_page</string>
 </resources>

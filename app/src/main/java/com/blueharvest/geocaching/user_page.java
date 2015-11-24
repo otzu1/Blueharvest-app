@@ -1,6 +1,7 @@
 package com.blueharvest.geocaching;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -11,9 +12,10 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -22,33 +24,56 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Marker;
-
-public class user_home_page extends AppCompatActivity implements
-        LocationListener {
+public class user_page extends AppCompatActivity implements LocationListener {
 
     private GoogleMap mMap;
+    private EditText mLatitude;
+    private EditText mLongitude;
+    private EditText mSearchRad;
     private final static int MY_LOCATION_PERMISSION = 1;
-    private double currentLat = 0.0;
-    private double currentLong = 0.0;
-
-    private static final String logCat = "user home page";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_home_page);
+        setContentView(R.layout.activity_user_page);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mLatitude = (EditText) findViewById(R.id.latitude);
+        mLongitude = (EditText) findViewById(R.id.longitude);
+        mSearchRad = (EditText) findViewById(R.id.searchRad);
 
-        Double searchRadius = getIntent().getDoubleExtra("SearchRad", 0.00);
-        Double searchLat = getIntent().getDoubleExtra("SearchLat", 0.00);
-        Double searchLong = getIntent().getDoubleExtra("SearchLong", 0.00);
+        View mMapView = findViewById(R.id.mapParent);
 
-        View mMapView = findViewById(R.id.user_home_content_form);
+        Button mSearch = (Button) findViewById(R.id.buttonSearch);
+        mSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchGeocache();
+            }
+        });
+
+        Button mAddGeocache = (Button) findViewById(R.id.buttonAddGeo);
+        mAddGeocache.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addGeocache();
+            }
+        });
+
+        Button mSettings = (Button) findViewById(R.id.buttonSettings);
+        mSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openSettings();
+            }
+        });
+
+        Button mHelp = (Button) findViewById(R.id.buttonHelp);
+        mSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openHelp();
+            }
+        });
 
         /* Check for permissions to access the fine location.  If permissions not
            granted, give and explanation and request the permissions.
@@ -77,38 +102,6 @@ public class user_home_page extends AppCompatActivity implements
                 }
             }
         }
-
-        blueharvest.geocaching.soap.objects.geocache.geocaches searchResults = searchTask(searchLat, searchLong, searchRadius);
-
-        // Generate the markers on the map
-        for(blueharvest.geocaching.soap.objects.geocache geocache : searchResults) {
-
-            Marker marker = mMap.addMarker(new MarkerOptions()
-            .position(new LatLng(geocache.getLocation().getLatitude().getDecimalDegrees(), geocache.getLocation().getLongitude().getDecimalDegrees()))
-            .title(geocache.getName())
-            .snippet(geocache.getCode()));
-        }
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-
-            case MY_LOCATION_PERMISSION: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    setupMap();
-
-                } else {
-
-
-                }
-            }
-        }
-
     }
 
     public void setupMap() {
@@ -157,16 +150,39 @@ public class user_home_page extends AppCompatActivity implements
         }
     }
 
+    protected void searchGeocache() {
+        finish();
+        Intent searchIntent = new Intent(user_page.this, user_home_page.class);
+        Double searchRad = Double.parseDouble(mSearchRad.getText().toString());
+        Double searchLat = Double.parseDouble(mLatitude.getText().toString());
+        Double searchLong = Double.parseDouble(mLongitude.getText().toString());
+        searchIntent.putExtra("SearchRad", searchRad);
+        searchIntent.putExtra("SearchLat", searchLat);
+        searchIntent.putExtra("SearchLong", searchLong);
+        startActivity(searchIntent);
+    }
+
+    protected void addGeocache() {
+        finish();
+        startActivity(new Intent(user_page.this, AddGeocacheActivity.class));
+    }
+
+    protected void openSettings() {
+        finish();
+    }
+
+    protected void openHelp() {
+        finish();
+    }
+
     @Override
     public void onLocationChanged(Location location) {
 
         // Getting latitude of the current location
         double latitude = location.getLatitude();
-        currentLat = latitude;
 
         // Getting longitude of the current location
         double longitude = location.getLongitude();
-        currentLong = longitude;
 
         // Creating a LatLng object for the current location
         LatLng latLng = new LatLng(latitude, longitude);
@@ -176,6 +192,12 @@ public class user_home_page extends AppCompatActivity implements
 
         // Zoom in the Google Map
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+
+        // Update the lat and longitude fields
+        String lat = new Double(latitude).toString();
+        String lon = new Double(longitude).toString();
+        mLatitude.setText(lat, TextView.BufferType.NORMAL);
+        mLongitude.setText(lon, TextView.BufferType.NORMAL);
 
     }
 
@@ -194,21 +216,4 @@ public class user_home_page extends AppCompatActivity implements
 
     }
 
-    protected blueharvest.geocaching.soap.objects.geocache.geocaches searchTask(Double lat, Double lon, Double radius) {
-
-        try {
-            blueharvest.geocaching.soap.objects.geocache.geocaches results =
-                    new blueharvest.geocaching.soap.objects.geocache.geocaches(lat, lon, radius);
-            return results;
-        }
-        catch (Exception e) {
-            Log.d(logCat, "Error Getting Geocaches");
-            return new blueharvest.geocaching.soap.objects.geocache.geocaches(0.0, 0.0, 0.0);
-        }
-
-
-    }
-
-
 }
-
