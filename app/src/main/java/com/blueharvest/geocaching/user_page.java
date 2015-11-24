@@ -50,7 +50,8 @@ public class user_page extends AppCompatActivity implements LocationListener {
             @Override
             public void onClick(View view) {
                 Log.d("blueharvest", "search button clicked");
-                //searchGeocache();
+                // this is never reached as far as I can see in the log
+                searchGeocache();
             }
         });
 
@@ -58,12 +59,13 @@ public class user_page extends AppCompatActivity implements LocationListener {
         mAddGeocache.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("blueharvest", "add geocache button clicked");
                 addGeocache();
             }
         });
 
         Button mSettings = (Button) findViewById(R.id.buttonSettings);
-        mSearch.setOnClickListener(new View.OnClickListener() {
+        mSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openSettings();
@@ -71,7 +73,7 @@ public class user_page extends AppCompatActivity implements LocationListener {
         });
 
         Button mHelp = (Button) findViewById(R.id.buttonHelp);
-        mSearch.setOnClickListener(new View.OnClickListener() {
+        mHelp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openHelp();
@@ -199,10 +201,16 @@ public class user_page extends AppCompatActivity implements LocationListener {
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
         // Update the lat and longitude fields
-        String lat = new Double(latitude).toString();
-        String lon = new Double(longitude).toString();
+        /*String lat = Double.valueOf(latitude).toString();
+        String lon = Double.valueOf(longitude).toString();
         mLatitude.setText(lat, TextView.BufferType.NORMAL);
-        mLongitude.setText(lon, TextView.BufferType.NORMAL);
+        mLongitude.setText(lon, TextView.BufferType.NORMAL);*/
+
+        // using format to restrict the decimal places
+        ((EditText) findViewById(R.id.latitude)).setText(String.valueOf(
+                new java.text.DecimalFormat("##0.#######").format(latitude)));
+        ((EditText) findViewById(R.id.longitude)).setText(String.valueOf(
+                new java.text.DecimalFormat("##0.#######").format(longitude)));
 
     }
 
