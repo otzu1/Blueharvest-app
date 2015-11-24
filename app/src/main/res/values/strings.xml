@@ -39,4 +39,7 @@
     <string name="add_logbook_entry_text">Enter the logbook entry text here.</string>
     <string name="add_logbook_entry_title">Title</string>
     <string name="add_logbook_entry_save">Save</string>
+    <string name="action_settings">Settings</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 </resources>
