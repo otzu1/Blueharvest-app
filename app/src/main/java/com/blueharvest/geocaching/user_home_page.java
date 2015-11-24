@@ -39,12 +39,13 @@ public class user_home_page extends AppCompatActivity implements LocationListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_user_home_page);
+        setContentView(R.layout.activity_user_home_page);
 
         Log.d("blueharvest", "user_home_page.java");
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        // todo: fixme, this is broken
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);*/
 
         Double searchRadius = getIntent().getDoubleExtra("SearchRad", 0.00);
         Double searchLat = getIntent().getDoubleExtra("SearchLat", 0.00);
