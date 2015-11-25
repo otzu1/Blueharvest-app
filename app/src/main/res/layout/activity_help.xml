@@ -13,7 +13,8 @@
     <ScrollView
         android:id="@+id/ScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,8 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/help_heading1"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                />
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <TextView
                 android:id="@+id/body1"
@@ -46,25 +46,48 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"/>
 
             <TextView
+                android:id="@+id/heading2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/help_heading2"
-                android:id="@+id/heading2"/>
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <TextView
+                android:id="@+id/body2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/help_body2"
-                android:id="@+id/body2"/>
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
 
             <TextView
+                android:id="@+id/heading3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/help_bug"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+            <TextView
+                android:id="@+id/body3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/help_body3"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+            <TextView
+                android:id="@+id/issues"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:text="@string/help_issues"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColorLink="#576586"/>
+
+            <TextView
+                android:id="@+id/more"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:text="@string/help_more"
-                android:id="@+id/more"/>
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <TextView
                 android:id="@+id/wikipedia"
@@ -86,34 +109,33 @@
                 android:textColorLink="#576586"/>
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#8bae88">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/matt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
                     android:text="@string/help_matt"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:gravity="center_horizontal"/>
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
 
                 <TextView
                     android:id="@+id/brian"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
                     android:text="@string/help_brian"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:gravity="center_horizontal"/>
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
 
                 <TextView
                     android:id="@+id/jamie"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
                     android:text="@string/help_jamie"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:gravity="center_horizontal"/>
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
 
                 <TextView
                     android:id="@+id/version"

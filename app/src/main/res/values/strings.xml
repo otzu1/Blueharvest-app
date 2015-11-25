@@ -50,9 +50,12 @@
     <string name="help_body1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed viverra pellentesque sollicitudin. Quisque dolor odio, euismod nec diam sed, dapibus varius felis. Morbi convallis dapibus quam ut viverra. Aliquam enim tellus, fermentum at rutrum convallis, blandit at tellus. Cras ultricies libero non magna venenatis, ac lacinia orci tristique. Proin non nulla ac velit convallis consequat auctor eget ipsum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed pretium hendrerit odio et ultricies. Duis dignissim vel magna sed rhoncus. Etiam quis nisi in nisl auctor tempor. Aliquam rhoncus, tellus id commodo congue, magna lectus hendrerit sapien, nec vehicula nulla neque ut ligula.</string>
     <string name="help_wikipedia">https://en.wikipedia.org/wiki/Geocaching</string>
     <string name="help_more">More Information</string>
-    <string name="help_matt">Matt (latitude, longitude)</string>
-    <string name="help_brian">Brian (latitude, longitude)</string>
+    <string name="help_matt">Matt (40.7982009, -77.8599084)</string>
+    <string name="help_brian">Brian (40.7982009, -77.8599084)</string>
     <string name="help_jamie">Jamie (40.493012, -75.611022)</string>
     <string name="help_body2">Donec mollis nisi nec massa molestie pretium. Sed ut erat consectetur nulla porta condimentum. Integer eu tincidunt neque. Mauris vestibulum at dui vel ornare. Suspendisse laoreet diam ut ornare finibus. Vivamus fringilla scelerisque bibendum. In orci nunc, semper et dolor a, convallis lacinia risus. Mauris non gravida augue, eu tempus justo. Donec id sem vitae quam dignissim consectetur ut varius orci. In consectetur enim elementum ligula fringilla, a pellentesque turpis porttitor. Curabitur accumsan, nisi sed aliquam ultrices, mauris nisi blandit odio, sed gravida massa velit eu diam. Maecenas efficitur gravida nunc et luctus. Aenean vitae nulla accumsan, hendrerit sapien ut, fermentum metus. Duis sapien ex, sodales vitae interdum in, eleifend at lectus.</string>
     <string name="help_heading2">Donec Mollis</string>
+    <string name="help_bug">Report a Bug</string>
+    <string name="help_body3">Please report all bugs on:</string>
+    <string name="help_issues">https://github.com/otzu1/Blueharvest-app/issues</string>
 </resources>
