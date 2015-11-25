@@ -91,6 +91,9 @@
             android:name=".HelpActivity"
             android:label="Help">
         </activity>
+        <activity android:name=".ErrorActivity"
+            android:label="Error">
+        </activity>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

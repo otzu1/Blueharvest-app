@@ -62,4 +62,5 @@
     <string name="view_geocache_found">found</string>
     <string name="view_geocache_found_label">Found?</string>
     <string name="view_geocache_favorite_label">Favorite</string>
+    <string name="error_the_scream">The Scream</string>
 </resources>
