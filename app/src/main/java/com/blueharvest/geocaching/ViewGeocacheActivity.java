@@ -8,11 +8,14 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,7 +41,7 @@ import blueharvest.geocaching.concepts.location;
  * The user has the option to log the geocache from this activity from a stationary "log" button.
  * The layout above the log button scrolls with room to spare at the bottom to avoid blocking the
  * geocache information.
- * <p>
+ * <p/>
  * todo: send intent message to a log activity
  * todo: send intent to view all logs of this geocache
  * todo: get current location to display the distance to the geocache (requires LocationListener)
@@ -69,21 +72,21 @@ public class ViewGeocacheActivity extends FragmentActivity {
         //new GeocacheTask().execute(getIntent().getStringExtra("code"));
         new GeocacheTask().execute("BH13GC7");
 
-        // favorite button with click listener
-        ImageButton favorite = (ImageButton) findViewById(R.id.favorite);
+        // favorite custom checkbox
+        final CheckBox favorite = (CheckBox) findViewById(R.id.favorite);
         favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // todo: do something here
+                new FavoriteTask().execute(favorite.isChecked());
             }
         });
 
-        // found button with click listener
-        ImageButton found = (ImageButton) findViewById(R.id.found);
+        // found custom checkbox
+        final CheckBox found = (CheckBox) findViewById(R.id.found);
         found.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // todo: do something here
+                new FoundTask().execute(found.isChecked());
             }
         });
 
@@ -137,7 +140,7 @@ public class ViewGeocacheActivity extends FragmentActivity {
          * Override this method to perform a computation on a background thread. The
          * specified parameters are the parameters passed to {@link #execute}
          * by the caller of this task.
-         * <p>
+         * <p/>
          * This method can call {@link #publishProgress} to publish updates
          * on the UI thread.
          *
@@ -159,11 +162,13 @@ public class ViewGeocacheActivity extends FragmentActivity {
             return null;
         }
 
+        @Override
         protected void onProgressUpdate(Integer... progress) {
             //setProgressPercent(progress[0]);
         }
 
-        protected void onPostExecute(Long result) {
+        @Override
+        protected void onPostExecute(Void result) {
             //showDialog("something");
         }
 
@@ -179,8 +184,12 @@ public class ViewGeocacheActivity extends FragmentActivity {
         private blueharvest.geocaching.concepts.geocache g;
 
         protected Void doInBackground(String... params) {
-            //Log.d(TAG, params[0] + " was sent to the background task");
-            g = blueharvest.geocaching.soap.objects.geocache.get(params[0]);
+            try {
+                g = blueharvest.geocaching.soap.objects.geocache.get(params[0]);
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage());
+                e.printStackTrace();
+            }
             return null;
         }
 
@@ -192,47 +201,188 @@ public class ViewGeocacheActivity extends FragmentActivity {
          */
         @Override
         protected void onPostExecute(Void result) {
-            map.moveCamera(CameraUpdateFactory.newLatLng(
-                    new LatLng(g.getLocation().getLatitude().getDecimalDegrees(),
-                            g.getLocation().getLongitude().getDecimalDegrees())));
-            // Zoom in the Google Map
-            map.animateCamera(CameraUpdateFactory.zoomTo(15));
-            // Geocache location marker with name
-            map.addMarker(new MarkerOptions()
-                    .position(new LatLng(g.getLocation().getLatitude().getDecimalDegrees(),
-                            g.getLocation().getLongitude().getDecimalDegrees()))
-                    .title(g.getName()));
-            // set up widgets
-            ((TextView) findViewById(R.id.latitude)).setText(
-                    g.getLocation().getLatitude().toSexigesimal(
-                            location.coordinate.type.latitude));
-            ((TextView) findViewById(R.id.longitude)).setText(
-                    g.getLocation().getLongitude().toSexigesimal(
-                            location.coordinate.type.longitude));
-            ((TextView) findViewById(R.id.name)).setText(g.getName());
-            ((TextView) findViewById(R.id.code)).setText(g.getCode());
-            ((TextView) findViewById(R.id.type)).setText(
-                    getResources().getStringArray(R.array.geocache_types)[g.getType()]);
-            ((TextView) findViewById(R.id.size)).setText(
-                    getResources().getStringArray(R.array.geocache_sizes)[g.getType()]);
-            ((TextView) findViewById(R.id.terrain)).setText(
-                    getResources().getStringArray(R.array.geocache_terrain)[g.getType()]);
-            ((TextView) findViewById(R.id.difficulty)).setText(
-                    getResources().getStringArray(R.array.geocache_difficulty)[g.getType()]);
-            // todo: fade out long descriptions and offer a button to "read more"
-            ((TextView) findViewById(R.id.description)).setText(g.getDescription());
-            // todo: creator image (avatar)
-            if (g.getCreator().getImage() != null && g.getCreator().getImage().getUri() != null) {
-                 /* Download the image from online and set it as ImageView image programmatically. */
-                //Log.d(TAG, g.getCreator().getImage().getUri().toString());
-                new DownloadUserImageTask(((ImageView) findViewById(R.id.creator_image))).execute(
-                        g.getCreator().getImage().getUri().toString());
+            if (g != null) {
+                map.moveCamera(CameraUpdateFactory.newLatLng(
+                        new LatLng(g.getLocation().getLatitude().getDecimalDegrees(),
+                                g.getLocation().getLongitude().getDecimalDegrees())));
+                // Zoom in the Google Map
+                map.animateCamera(CameraUpdateFactory.zoomTo(15));
+                // Geocache location marker with name
+                map.addMarker(new MarkerOptions()
+                        .position(new LatLng(g.getLocation().getLatitude().getDecimalDegrees(),
+                                g.getLocation().getLongitude().getDecimalDegrees()))
+                        .title(g.getName()));
+                // set up widgets
+                ((TextView) findViewById(R.id.latitude)).setText(
+                        g.getLocation().getLatitude().toSexigesimal(
+                                location.coordinate.type.latitude));
+                ((TextView) findViewById(R.id.longitude)).setText(
+                        g.getLocation().getLongitude().toSexigesimal(
+                                location.coordinate.type.longitude));
+                ((TextView) findViewById(R.id.name)).setText(g.getName());
+                ((TextView) findViewById(R.id.code)).setText(g.getCode());
+                ((TextView) findViewById(R.id.type)).setText(
+                        getResources().getStringArray(R.array.geocache_types)[g.getType()]);
+                ((TextView) findViewById(R.id.size)).setText(
+                        getResources().getStringArray(R.array.geocache_sizes)[g.getType()]);
+                ((TextView) findViewById(R.id.terrain)).setText(
+                        getResources().getStringArray(R.array.geocache_terrain)[g.getType()]);
+                ((TextView) findViewById(R.id.difficulty)).setText(
+                        getResources().getStringArray(R.array.geocache_difficulty)[g.getType()]);
+                // todo: fade out long descriptions and offer a button to "read more"
+                ((TextView) findViewById(R.id.description)).setText(g.getDescription());
+                // todo: creator image (avatar)
+                if (g.getCreator().getImage() != null && g.getCreator().getImage().getUri() != null) {
+                    /* Download the image from online and set it as ImageView image programmatically. */
+                    new DownloadUserImageTask(((ImageView) findViewById(R.id.creator_image))).execute(
+                            g.getCreator().getImage().getUri().toString());
+                }
+                ((TextView) findViewById(R.id.creator)).setText("Placed by: " + g.getCreator().getUsername());
+                // todo: format anniversary
+                ((TextView) findViewById(R.id.anniversary)).setText(g.getAnniversary().toString());
+                ((TextView) findViewById(R.id.geocacheid)).setText(g.getId().toString());
+                ((TextView) findViewById(R.id.logbookid)).setText(g.getLogbook().getId().toString());
+            } else { // something went wrong, display a short message
+                Toast.makeText(getApplicationContext(),
+                        "Geocache could not be fetched. Try again later.",
+                        Toast.LENGTH_SHORT).show();
             }
-            ((TextView) findViewById(R.id.creator)).setText("Placed by: " + g.getCreator().getUsername());
-            // todo: format anniversary
-            ((TextView) findViewById(R.id.anniversary)).setText(g.getAnniversary().toString());
-            ((TextView) findViewById(R.id.geocacheid)).setText(g.getId().toString());
-            ((TextView) findViewById(R.id.logbookid)).setText(g.getLogbook().getId().toString());
+        }
+
+    }
+
+    /**
+     * @see <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsycncTask</a>
+     * Params, Progress, Result
+     * @since 2015-11-24
+     */
+    public class FavoriteTask extends AsyncTask<Boolean, Void, Boolean> {
+
+        /**
+         * Override this method to perform a computation on a background thread. The
+         * specified parameters are the parameters passed to {@link #execute}
+         * by the caller of this task.
+         * <p/>
+         * This method can call {@link #publishProgress} to publish updates
+         * on the UI thread.
+         *
+         * @param params The parameters of the task.
+         * @return A result, defined by the subclass of this task.
+         * @see #onPreExecute()
+         * @see #onPostExecute
+         * @see #publishProgress
+         */
+        @Override
+        protected Boolean doInBackground(Boolean... params) {
+            // get user identifier from shared preferences
+            String me = getApplicationContext().getSharedPreferences(
+                    "blueharvest", MODE_PRIVATE).getString("me", null);
+            if (me != null) {
+                if (params[0]) { // favorite is checked, user wants to favorite this geocache
+                    Log.d(TAG, "favorite me!");
+                    try {
+                        // todo: no such method exists in the library at this time
+                        //blueharvest.geocaching.soap.objects.geocache.favorite(java.util.UUID.fromString(me));
+                        return true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (!params[0]) { // favorite is unchecked, user wants to un-favorite this geocache
+                    Log.d(TAG, "un-favorite me!");
+                    try {
+                        // todo: no such method exists in the library at this time
+                        //blueharvest.geocaching.soap.objects.geocache.unfavorite(java.util.UUID.fromString(me));
+                        return false;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return null; // something went wrong, deal with it in onPostExecute
+        }
+
+        /**
+         * check or uncheck the favorite checkbox
+         * if an error occured (null result), then revert check
+         *
+         * @param result
+         */
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result == null) {
+                ((CheckBox) findViewById(R.id.favorite)).setChecked(!result);
+                // something went wrong, display a short message
+                Toast.makeText(getApplicationContext(), "Favorite not available. Try again later.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+    /**
+     * @see <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsycncTask</a>
+     * Params, Progress, Result
+     * @since 2015-11-24
+     */
+    public class FoundTask extends AsyncTask<Boolean, Void, Boolean> {
+
+        /**
+         * Override this method to perform a computation on a background thread. The
+         * specified parameters are the parameters passed to {@link #execute}
+         * by the caller of this task.
+         * <p/>
+         * This method can call {@link #publishProgress} to publish updates
+         * on the UI thread.
+         *
+         * @param params The parameters of the task.
+         * @return A result, defined by the subclass of this task.
+         * @see #onPreExecute()
+         * @see #onPostExecute
+         * @see #publishProgress
+         */
+        @Override
+        protected Boolean doInBackground(Boolean... params) {
+            // get user identifier from shared preferences
+            String me = getApplicationContext().getSharedPreferences(
+                    "blueharvest", MODE_PRIVATE).getString("me", null);
+            if (me != null) {
+                if (params[0]) { // found is checked, user wants to set this geocache as found
+                    Log.d(TAG, "found me!");
+                    try {
+                        // todo: no such method exists in the library at this time
+                        //blueharvest.geocaching.soap.objects.geocache.found(java.util.UUID.fromString(me));
+                        return true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (!params[0]) { // found is unchecked, user wants to set this geocache as unfound
+                    Log.d(TAG, "unfound me!");
+                    try {
+                        // todo: no such method exists in the library at this time
+                        //blueharvest.geocaching.soap.objects.geocache.unfound(java.util.UUID.fromString(me));
+                        return false;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return null; // something went wrong, deal with it in onPostExecute
+        }
+
+        /**
+         * check or uncheck the favorite checkbox
+         * if an error occured (null result), then revert check
+         *
+         * @param result
+         */
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result == null) {
+                ((CheckBox) findViewById(R.id.found)).setChecked(!result);
+                // something went wrong, display a short message
+                Toast.makeText(getApplicationContext(), "Found not available. Try again later.",
+                        Toast.LENGTH_SHORT).show();
+            }
         }
 
     }
@@ -256,7 +406,7 @@ public class ViewGeocacheActivity extends FragmentActivity {
          * Override this method to perform a computation on a background thread. The
          * specified parameters are the parameters passed to {@link #execute}
          * by the caller of this task.
-         * <p>
+         * <p/>
          * This method can call {@link #publishProgress} to publish updates
          * on the UI thread.
          *

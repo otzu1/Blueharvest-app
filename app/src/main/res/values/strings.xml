@@ -58,4 +58,8 @@
     <string name="help_bug">Report a Bug</string>
     <string name="help_body3">Please report all bugs on:</string>
     <string name="help_issues">https://github.com/otzu1/Blueharvest-app/issues</string>
+    <string name="view_geocache_favorite">favorite</string>
+    <string name="view_geocache_found">found</string>
+    <string name="view_geocache_found_label">Found?</string>
+    <string name="view_geocache_favorite_label">Favorite</string>
 </resources>
