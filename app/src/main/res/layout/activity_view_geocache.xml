@@ -74,24 +74,24 @@
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:orientation="horizontal"
                 android:weightSum="1">
 
                 <LinearLayout
-                    android:orientation="horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:orientation="horizontal"
                     >
 
                     <TextView
+                        android:id="@+id/favorite_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:labelFor="@drawable/favorite_geocache"
                         android:text="@string/view_geocache_favorite_label"
-                        android:id="@+id/favorite_label"
-                        android:labelFor="@drawable/favorite_geocache"/>
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
 
                     <CheckBox
                         android:id="@+id/favorite"
@@ -109,18 +109,18 @@
                     />
 
                 <LinearLayout
-                    android:orientation="horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:orientation="horizontal"
                     >
 
                     <TextView
+                        android:id="@+id/found_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:labelFor="@drawable/found_geocache"
                         android:text="@string/view_geocache_found_label"
-                        android:id="@+id/found_label"
-                        android:labelFor="@drawable/found_geocache"/>
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
 
                     <CheckBox
                         android:id="@+id/found"
