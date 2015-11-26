@@ -461,7 +461,8 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         //        .strokeWidth(3f)); // pixels
 
         // surrounding geocaches
-        new GeocachesTask().execute(latitude, longitude, 10d);
+        // todo: show if we wanna
+        //new GeocachesTask().execute(latitude, longitude, 10d);
     }
 
     /**
