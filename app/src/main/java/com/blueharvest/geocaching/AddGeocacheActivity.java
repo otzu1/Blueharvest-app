@@ -44,7 +44,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * a suggested random code (blueharvest-0.0.3+ required). Spinner controls are used for enumerating
  * values for size, terrain, and difficulty. The values for the enumerations are found hard-coded
  * in each respective .xml resource file in a string array and accessible through an adapter.
- * <p>
+ * <p/>
  * This activity then directs the usee to the view geocache activity.
  * todo: validation, handle no location, etc.
  *
@@ -59,7 +59,6 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
 
     // map
     private final static int MY_LOCATION_PERMISSION = 1;
-    private final static double distance = 10; // km
     private GoogleMap map;
 
     @Override
@@ -67,8 +66,22 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_geocache);
 
-        // map including default latitude and longitude
+        // get user identifier from shared preferences
+        // if we can't, disable the save button and notify the user
+        if (getApplicationContext().getSharedPreferences(
+                "blueharvest", MODE_PRIVATE).getString("me", null) == null) {
+            Toast.makeText(getApplicationContext(),
+                    "Add Geocache is not available. Please try again later.",
+                    Toast.LENGTH_SHORT).show();
+            findViewById(R.id.save).setEnabled(false);
+        }
+
+        // map defaults including latitude and longitude
         setUpMap();
+
+        // non-map defaults
+        ((EditText) findViewById(R.id.code)).setText(
+                blueharvest.geocaching.soap.objects.geocache.randomCode());
 
         // type spinner
         // todo: hint for the spinner
@@ -108,88 +121,192 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         // Apply the adapter to the spinner
         ((Spinner) findViewById(R.id.difficulty)).setAdapter(difficultyAdapter);
 
-        // todo: validate user entry
+        // validate user entries
         final EditText latitude = (EditText) findViewById(R.id.latitude);
-        latitude.addTextChangedListener(
-                new TextWatcher() {
-                    /**
-                     * This method is called to notify you that, within <code>s</code>,
-                     * the <code>count</code> characters beginning at <code>start</code>
-                     * are about to be replaced by new text with length <code>after</code>.
-                     * It is an error to attempt to make changes to <code>s</code> from
-                     * this callback.
-                     *
-                     * @param s
-                     * @param start
-                     * @param count
-                     * @param after
-                     */
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        latitude.addTextChangedListener(new TextWatcher() {
+            /**
+             * This method is called to notify you that, within <code>s</code>,
+             * the <code>count</code> characters beginning at <code>start</code>
+             * are about to be replaced by new text with length <code>after</code>.
+             * It is an error to attempt to make changes to <code>s</code> from
+             * this callback.
+             *
+             * @param s
+             * @param start
+             * @param count
+             * @param after
+             */
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                    }
+            }
 
-                    /**
-                     * This method is called to notify you that, within <code>s</code>,
-                     * the <code>count</code> characters beginning at <code>start</code>
-                     * have just replaced old text that had length <code>before</code>.
-                     * It is an error to attempt to make changes to <code>s</code> from
-                     * this callback.
-                     *
-                     * @param s
-                     * @param start
-                     * @param before
-                     * @param count
-                     */
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+            /**
+             * This method is called to notify you that, within <code>s</code>,
+             * the <code>count</code> characters beginning at <code>start</code>
+             * have just replaced old text that had length <code>before</code>.
+             * It is an error to attempt to make changes to <code>s</code> from
+             * this callback.
+             *
+             * @param s
+             * @param start
+             * @param before
+             * @param count
+             */
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                    }
+            }
 
-                    /**
-                     * This method is called to notify you that, somewhere within
-                     * <code>s</code>, the text has been changed.
-                     * It is legitimate to make further changes to <code>s</code> from
-                     * this callback, but be careful not to get yourself into an infinite
-                     * loop, because any changes you make will cause this method to be
-                     * called again recursively.
-                     * (You are not told where the change took place because other
-                     * afterTextChanged() methods may already have made other changes
-                     * and invalidated the offsets.  But if you need to know here,
-                     * you can use {@link Spannable#setSpan} in {@link #onTextChanged}
-                     * to mark your place and then look up from here where the span
-                     * ended up.
-                     *
-                     * @param s
-                     */
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        // do something
-                        Log.d(TAG, "aftertextchanged");
+            /**
+             * This method is called to notify you that, somewhere within
+             * <code>s</code>, the text has been changed.
+             * It is legitimate to make further changes to <code>s</code> from
+             * this callback, but be careful not to get yourself into an infinite
+             * loop, because any changes you make will cause this method to be
+             * called again recursively.
+             * (You are not told where the change took place because other
+             * afterTextChanged() methods may already have made other changes
+             * and invalidated the offsets.  But if you need to know here,
+             * you can use {@link Spannable#setSpan} in {@link #onTextChanged}
+             * to mark your place and then look up from here where the span
+             * ended up.
+             *
+             * Two situations exist where the text would be edited, manually or by
+             * dragging the marker.
+             *
+             * @param s
+             */
+            @Override
+            public void afterTextChanged(Editable s) {
+                latitude.setError(null);
+                // http://www.regexlib.com/REDetails.aspx?regexp_id=1535
+                // ^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,7}
+                if (!latitude.getText().toString().matches(
+                        "^-?([1-8]?[1-9]|[1-9]0)\\.{1}\\d{1,7}"))
+                    latitude.setError("Latitude is not in decimal degrees.");
+            }
+        });
 
-                    }
-                });
+        final EditText longitude = (EditText) findViewById(R.id.longitude);
+        longitude.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                longitude.setError(null);
+                // http://www.regexlib.com/REDetails.aspx?regexp_id=1536
+                // ^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,7}
+                if (!longitude.getText().toString().matches(
+                        "^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\\.{1}\\d{1,7}"))
+                    longitude.setError("Longitude must be in decimal degrees.");
+            }
+        });
+
+        final EditText name = (EditText) findViewById(R.id.name);
+        name.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                name.setError(null);
+                if (name.getText().toString().isEmpty())
+                    name.setError("Name cannot be empty.");
+            }
+        });
+
+        final EditText description = (EditText) findViewById(R.id.description);
+        description.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                description.setError(null);
+                if (description.getText().toString().isEmpty())
+                    description.setError("Description cannot be empty.");
+            }
+        });
+
+        final EditText code = (EditText) findViewById(R.id.code);
+        code.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                code.setError(null);
+                if (code.getText().toString().isEmpty()) {
+                    code.setError("Code cannot be empty.");
+                }
+            }
+        });
+
         // save button with click listener
         Button save = (Button) findViewById(R.id.save);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // get user identifier from shared preferences
-                String me = getApplicationContext().getSharedPreferences(
-                        "blueharvest", MODE_PRIVATE).getString("me", null);
-                if (me != null) {
-                    // wrap the widget texts in a geocache object and
-                    // send it to the background thread to add the geocache
-                    // error handling is taken care of in the Task
-                    new AddGeocacheTask().execute(Geocache(java.util.UUID.fromString(me)));
-                    Intent intent = new Intent(AddGeocacheActivity.this, ViewGeocacheActivity.class);
-                    intent.putExtra("code", ((EditText) findViewById(R.id.code)).getText().toString());
-                    startActivity(intent);
-                } else { // something went wrong, display a short message
-                    Toast.makeText(getApplicationContext(),
-                            "Add Geocache is not available. Try again later.",
-                            Toast.LENGTH_SHORT).show();
+                // validate
+                if (latitude.getError() != null) {
+                    latitude.requestFocus();
+                    return;
                 }
+                if (longitude.getError() != null) {
+                    longitude.requestFocus();
+                    return;
+                }
+                if (name.getError() != null || name.getText().toString().isEmpty()) {
+                    name.requestFocus();
+                    return;
+                }
+                if (description.getError() != null || description.getText().toString().isEmpty()) {
+                    description.requestFocus();
+                    return;
+                }
+                if (code.getError() != null || description.getText().toString().isEmpty()) {
+                    code.setText(blueharvest.geocaching.soap.objects.geocache.randomCode());
+                    code.requestFocus();
+                    return;
+                }
+                // good to go!
+                // wrap the widget texts in a geocache object and
+                // send it to the background thread to add the geocache
+                // error handling is taken care of in the task
+                new AddGeocacheTask().execute(Geocache(java.util.UUID.fromString(
+                        getApplicationContext().getSharedPreferences(
+                                "blueharvest", MODE_PRIVATE).getString("me", null))));
+                Intent intent = new Intent(AddGeocacheActivity.this, ViewGeocacheActivity.class);
+                intent.putExtra("code", ((EditText) findViewById(R.id.code)).getText().toString());
+                startActivity(intent);
             }
         });
         /*Dialog dialog = GooglePlayServicesUtil.getErrorDialog(0, this, 0);
@@ -268,6 +385,8 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
                 Location location = locationManager.getLastKnownLocation(provider);
                 if (location != null) {
                     onLocationChanged(location);
+                } else { // set up a mock location
+                    handleLocation(40.7981884, -77.8599151); // Penn State
                 }
                 // 10 minutes should be plenty ... if not, increase this
                 locationManager.requestLocationUpdates(provider, 600000, 0, this);
@@ -275,21 +394,11 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         }
     }
 
-    /**
-     * Called when the location has changed.
-     * <p>
-     * <p> There are no restrictions on the use of the supplied Location object.
-     *
-     * @param location The new location, as a Location object.
-     */
-    @Override
-    public void onLocationChanged(Location location) {
-        Log.d(TAG, location.toString());
+    private void handleLocation(double latitude, double longitude) {
         // clear the map
         map.clear();
         // Showing the current location in Google Map
-        map.moveCamera(CameraUpdateFactory.newLatLng(
-                new LatLng(location.getLatitude(), location.getLongitude())));
+        map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(latitude, longitude)));
         // Zoom in the Google Map
         map.animateCamera(CameraUpdateFactory.zoomTo(15));
         // Geocache Latitude and Longitude
@@ -297,13 +406,13 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         if (((EditText) findViewById(R.id.latitude)).getText().toString().isEmpty()
                 && ((EditText) findViewById(R.id.longitude)).getText().toString().isEmpty()) {
             ((EditText) findViewById(R.id.latitude)).setText(String.valueOf(
-                    new java.text.DecimalFormat("##0.#######").format(location.getLatitude())));
+                    new java.text.DecimalFormat("##0.#######").format(latitude)));
             ((EditText) findViewById(R.id.longitude)).setText(String.valueOf(
-                    new java.text.DecimalFormat("##0.#######").format(location.getLongitude())));
+                    new java.text.DecimalFormat("##0.#######").format(longitude)));
         }
-        // Current location marker
+        // location marker
         map.addMarker(new MarkerOptions()
-                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                .position(new LatLng(latitude, longitude))
                 .draggable(true)
                 .title("New Geocache Marker!"));
         map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
@@ -346,9 +455,19 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         //        .strokeWidth(3f)); // pixels
 
         // surrounding geocaches
-        // this is here in case we wanna show neighboring geocaches
-        // for performance, it's not being used at this time
-        //new GeocachesTask().execute(location);
+        new GeocachesTask().execute(latitude, longitude, 10d);
+    }
+
+    /**
+     * Called when the location has changed.
+     * <p/>
+     * <p> There are no restrictions on the use of the supplied Location object.
+     *
+     * @param location The new location, as a Location object.
+     */
+    @Override
+    public void onLocationChanged(Location location) {
+        handleLocation(location.getLatitude(), location.getLongitude());
     }
 
     /**
@@ -366,11 +485,11 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
      *                 provider is currently available.
      * @param extras   an optional Bundle which will contain provider specific
      *                 status variables.
-     *                 <p>
+     *                 <p/>
      *                 <p> A number of common key/value pairs for the extras Bundle are listed
      *                 below. Providers that use any of the keys on this list must
      *                 provide the corresponding value as described below.
-     *                 <p>
+     *                 <p/>
      *                 <ul>
      *                 <li> satellites - the number of satellites used to derive the fix
      */
@@ -402,7 +521,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
      * Params, Progress, Result
      * @since 2015-11-20
      */
-    public class GeocachesTask extends AsyncTask<Location, Integer, Void> {
+    public class GeocachesTask extends AsyncTask<Double, Integer, Void> {
 
         private blueharvest.geocaching.soap.objects.geocache.geocaches geocaches;
 
@@ -410,25 +529,21 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
          * Override this method to perform a computation on a background thread. The
          * specified parameters are the parameters passed to {@link #execute}
          * by the caller of this task.
-         * <p>
+         * <p/>
          * This method can call {@link #publishProgress} to publish updates
          * on the UI thread.
          *
-         * @param locations The parameters of the task.
+         * @param params The parameters of the task.
+         *               params[0] is latitude, params[1] is longitude, and params[2] is distance
          * @return A result, defined by the subclass of this task.
          * @see #onPreExecute()
          * @see #onPostExecute
          * @see #publishProgress
          */
         @Override
-        protected Void doInBackground(Location... locations) {
-            for (int i = 0; i < locations.length; i++) { // should only be one
-                double myLatitude = locations[i].getLatitude();
-                double myLongitude = locations[i].getLongitude();
-                // get the geocaches from around the location coordinates here
-                geocaches = new blueharvest.geocaching.soap.objects.geocache.geocaches(
-                        myLatitude, myLongitude, distance);
-            }
+        protected Void doInBackground(Double... params) {
+            geocaches = new blueharvest.geocaching.soap.objects.geocache.geocaches(
+                    params[0], params[1], params[2]);
             return null;
         }
 
@@ -452,6 +567,10 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
                             .title(g.getName())
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                 }
+            } else if (geocaches == null) { // the nearby geocaches failed
+                Toast.makeText(getApplicationContext(),
+                        "Nearby geocaches is not available.",
+                        Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -464,7 +583,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
          * Override this method to perform a computation on a background thread. The
          * specified parameters are the parameters passed to {@link #execute}
          * by the caller of this task.
-         * <p>
+         * <p/>
          * This method can call {@link #publishProgress} to publish updates
          * on the UI thread.
          *
