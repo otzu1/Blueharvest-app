@@ -68,9 +68,13 @@ public class ViewGeocacheActivity extends FragmentActivity {
         setUpMap();
 
         // get the geocache and set up the view in the postexecute function
-        // todo: change after testing
-        //new GeocacheTask().execute(getIntent().getStringExtra("code"));
-        new GeocacheTask().execute("BH13GC7");
+        try {
+            new GeocacheTask().execute(getIntent().getStringExtra("code"));
+        } catch (Exception e) { // something went wrong, display a short message
+            Toast.makeText(getApplicationContext(),
+                    "Geocache could not be fetched. Try again later.",
+                    Toast.LENGTH_SHORT).show();
+        }
 
         // favorite custom checkbox
         final CheckBox favorite = (CheckBox) findViewById(R.id.favorite);

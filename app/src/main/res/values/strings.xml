@@ -63,4 +63,6 @@
     <string name="view_geocache_found_label">Found?</string>
     <string name="view_geocache_favorite_label">Favorite</string>
     <string name="error_the_scream">The Scream</string>
+    <string name="error_image_content_description">Oops! We seem to have a problem!</string>
+    <string name="error_message">May the Force be with you.</string>
 </resources>

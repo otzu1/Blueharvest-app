@@ -11,18 +11,22 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -55,19 +59,32 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
 
     // map
     private final static int MY_LOCATION_PERMISSION = 1;
-    private final static double distance = 10; // km
     private GoogleMap map;
-    private blueharvest.geocaching.soap.objects.geocache.geocaches geocaches;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_geocache);
 
-        // map including default latitude and longitude
+        // get user identifier from shared preferences
+        // if we can't, disable the save button and notify the user
+        if (getApplicationContext().getSharedPreferences(
+                "blueharvest", MODE_PRIVATE).getString("me", null) == null) {
+            Toast.makeText(getApplicationContext(),
+                    "Add Geocache is not available. Please try again later.",
+                    Toast.LENGTH_SHORT).show();
+            findViewById(R.id.save).setEnabled(false);
+        }
+
+        // map defaults including latitude and longitude
         setUpMap();
 
+        // non-map defaults
+        ((EditText) findViewById(R.id.code)).setText(
+                blueharvest.geocaching.soap.objects.geocache.randomCode());
+
         // type spinner
+        // todo: hint for the spinner
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(this,
                 R.array.geocache_types, android.R.layout.simple_spinner_item);
@@ -77,6 +94,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         ((Spinner) findViewById(R.id.type)).setAdapter(typeAdapter);
 
         // size spinner
+        // todo: hint for the spinner
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> sizeAdapter = ArrayAdapter.createFromResource(this,
                 R.array.geocache_sizes, android.R.layout.simple_spinner_item);
@@ -87,7 +105,9 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> terrainAdapter = ArrayAdapter.createFromResource(this,
                 R.array.geocache_terrain, android.R.layout.simple_spinner_item);
+
         // terrain spinner
+        // todo: hint for the spinner
         // Specify the layout to use when the list of choices appears
         terrainAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
@@ -101,31 +121,192 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         // Apply the adapter to the spinner
         ((Spinner) findViewById(R.id.difficulty)).setAdapter(difficultyAdapter);
 
+        // validate user entries
+        final EditText latitude = (EditText) findViewById(R.id.latitude);
+        latitude.addTextChangedListener(new TextWatcher() {
+            /**
+             * This method is called to notify you that, within <code>s</code>,
+             * the <code>count</code> characters beginning at <code>start</code>
+             * are about to be replaced by new text with length <code>after</code>.
+             * It is an error to attempt to make changes to <code>s</code> from
+             * this callback.
+             *
+             * @param s
+             * @param start
+             * @param count
+             * @param after
+             */
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            /**
+             * This method is called to notify you that, within <code>s</code>,
+             * the <code>count</code> characters beginning at <code>start</code>
+             * have just replaced old text that had length <code>before</code>.
+             * It is an error to attempt to make changes to <code>s</code> from
+             * this callback.
+             *
+             * @param s
+             * @param start
+             * @param before
+             * @param count
+             */
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            /**
+             * This method is called to notify you that, somewhere within
+             * <code>s</code>, the text has been changed.
+             * It is legitimate to make further changes to <code>s</code> from
+             * this callback, but be careful not to get yourself into an infinite
+             * loop, because any changes you make will cause this method to be
+             * called again recursively.
+             * (You are not told where the change took place because other
+             * afterTextChanged() methods may already have made other changes
+             * and invalidated the offsets.  But if you need to know here,
+             * you can use {@link Spannable#setSpan} in {@link #onTextChanged}
+             * to mark your place and then look up from here where the span
+             * ended up.
+             *
+             * Two situations exist where the text would be edited, manually or by
+             * dragging the marker.
+             *
+             * @param s
+             */
+            @Override
+            public void afterTextChanged(Editable s) {
+                latitude.setError(null);
+                // http://www.regexlib.com/REDetails.aspx?regexp_id=1535
+                // ^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,7}
+                if (!latitude.getText().toString().matches(
+                        "^-?([1-8]?[1-9]|[1-9]0)\\.{1}\\d{1,7}"))
+                    latitude.setError("Latitude is not in decimal degrees.");
+            }
+        });
+
+        final EditText longitude = (EditText) findViewById(R.id.longitude);
+        longitude.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                longitude.setError(null);
+                // http://www.regexlib.com/REDetails.aspx?regexp_id=1536
+                // ^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,7}
+                if (!longitude.getText().toString().matches(
+                        "^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\\.{1}\\d{1,7}"))
+                    longitude.setError("Longitude must be in decimal degrees.");
+            }
+        });
+
+        final EditText name = (EditText) findViewById(R.id.name);
+        name.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                name.setError(null);
+                if (name.getText().toString().isEmpty())
+                    name.setError("Name cannot be empty.");
+            }
+        });
+
+        final EditText description = (EditText) findViewById(R.id.description);
+        description.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                description.setError(null);
+                if (description.getText().toString().isEmpty())
+                    description.setError("Description cannot be empty.");
+            }
+        });
+
+        final EditText code = (EditText) findViewById(R.id.code);
+        code.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                code.setError(null);
+                if (code.getText().toString().isEmpty()) {
+                    code.setError("Code cannot be empty.");
+                }
+            }
+        });
+
         // save button with click listener
         Button save = (Button) findViewById(R.id.save);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // get user identifier from shared preferences
-                String me = getApplicationContext().getSharedPreferences(
-                        "blueharvest", MODE_PRIVATE).getString("me", null);
-                if (me != null) {
-                    // wrap the controls in a geocache object and
-                    // send it to the background thread to add the geocache
-                    new AddGeocacheTask().execute(Geocache(java.util.UUID.fromString(me)));
-                    // todo: handle problems with insert
-                    /*if (the-insert-failed) {
-                        // todo: do something, there's a problem
-                    } else {
-                        // todo: take the user to see the newly added geocache (like below)
-                    }*/
-                    Intent intent = new Intent(AddGeocacheActivity.this, ViewGeocacheActivity.class);
-                    intent.putExtra("code", ((EditText) findViewById(R.id.code)).getText().toString());
-                    startActivity(intent);
-                } else {
-                    // todo: something more elegant for the user
-                    System.out.println("me is null. help!");
+                // validate
+                if (latitude.getError() != null) {
+                    latitude.requestFocus();
+                    return;
                 }
+                if (longitude.getError() != null) {
+                    longitude.requestFocus();
+                    return;
+                }
+                if (name.getError() != null || name.getText().toString().isEmpty()) {
+                    name.requestFocus();
+                    return;
+                }
+                if (description.getError() != null || description.getText().toString().isEmpty()) {
+                    description.requestFocus();
+                    return;
+                }
+                if (code.getError() != null || description.getText().toString().isEmpty()) {
+                    code.setText(blueharvest.geocaching.soap.objects.geocache.randomCode());
+                    code.requestFocus();
+                    return;
+                }
+                // good to go!
+                // wrap the widget texts in a geocache object and
+                // send it to the background thread to add the geocache
+                // error handling is taken care of in the task
+                new AddGeocacheTask().execute(Geocache(java.util.UUID.fromString(
+                        getApplicationContext().getSharedPreferences(
+                                "blueharvest", MODE_PRIVATE).getString("me", null))));
+                Intent intent = new Intent(AddGeocacheActivity.this, ViewGeocacheActivity.class);
+                intent.putExtra("code", ((EditText) findViewById(R.id.code)).getText().toString());
+                startActivity(intent);
             }
         });
         /*Dialog dialog = GooglePlayServicesUtil.getErrorDialog(0, this, 0);
@@ -134,7 +315,6 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
 
     /**
      * transforms the controls into a geocache object
-     * todo: v 0.0.3 has a less complex insert to use
      *
      * @param userid
      * @return a geocache to add
@@ -205,27 +385,34 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
                 Location location = locationManager.getLastKnownLocation(provider);
                 if (location != null) {
                     onLocationChanged(location);
+                } else { // set up a mock location
+                    handleLocation(40.7981884, -77.8599151); // Penn State
                 }
-                locationManager.requestLocationUpdates(provider, 20000, 0, this);
+                // 10 minutes should be plenty ... if not, increase this
+                locationManager.requestLocationUpdates(provider, 600000, 0, this);
             }
         }
     }
 
-    public void handleNewLocation(Location location) {
-        Log.d(TAG, location.toString());
+    private void handleLocation(double latitude, double longitude) {
+        // clear the map
+        map.clear();
         // Showing the current location in Google Map
-        map.moveCamera(CameraUpdateFactory.newLatLng(
-                new LatLng(location.getLatitude(), location.getLongitude())));
+        map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(latitude, longitude)));
         // Zoom in the Google Map
         map.animateCamera(CameraUpdateFactory.zoomTo(15));
         // Geocache Latitude and Longitude
-        ((EditText) findViewById(R.id.latitude)).setText(String.valueOf(
-                new java.text.DecimalFormat("##0.#######").format(location.getLatitude())));
-        ((EditText) findViewById(R.id.longitude)).setText(String.valueOf(
-                new java.text.DecimalFormat("##0.#######").format(location.getLongitude())));
-        // Current location marker
+        // only do this if the entries are blank in case the user changed the values already
+        if (((EditText) findViewById(R.id.latitude)).getText().toString().isEmpty()
+                && ((EditText) findViewById(R.id.longitude)).getText().toString().isEmpty()) {
+            ((EditText) findViewById(R.id.latitude)).setText(String.valueOf(
+                    new java.text.DecimalFormat("##0.#######").format(latitude)));
+            ((EditText) findViewById(R.id.longitude)).setText(String.valueOf(
+                    new java.text.DecimalFormat("##0.#######").format(longitude)));
+        }
+        // location marker
         map.addMarker(new MarkerOptions()
-                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                .position(new LatLng(latitude, longitude))
                 .draggable(true)
                 .title("New Geocache Marker!"));
         map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
@@ -267,15 +454,8 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         //        .radius(distance * 1000) // meters (distance is km)
         //        .strokeWidth(3f)); // pixels
 
-        //new GeocachesTask().execute(location);
-        //if (geocaches != null) { // null check
-        //    for (blueharvest.geocaching.soap.objects.geocache g : geocaches) {
-        //        map.addMarker(new MarkerOptions().position(
-        //                new LatLng(g.getLocation().getLatitude().getDecimalDegrees(),
-        //                        g.getLocation().getLongitude().getDecimalDegrees()))
-        //                .title(g.getName()));
-        //    }
-        //}
+        // surrounding geocaches
+        new GeocachesTask().execute(latitude, longitude, 10d);
     }
 
     /**
@@ -287,7 +467,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
      */
     @Override
     public void onLocationChanged(Location location) {
-        handleNewLocation(location);
+        handleLocation(location.getLatitude(), location.getLongitude());
     }
 
     /**
@@ -314,7 +494,6 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
      *                 <li> satellites - the number of satellites used to derive the fix
      */
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
     /**
@@ -324,7 +503,6 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
      *                 update.
      */
     public void onProviderEnabled(String provider) {
-
     }
 
     /**
@@ -336,7 +514,6 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
      *                 update.
      */
     public void onProviderDisabled(String provider) {
-
     }
 
     /**
@@ -344,7 +521,9 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
      * Params, Progress, Result
      * @since 2015-11-20
      */
-    public class GeocachesTask extends AsyncTask<Location, Integer, Void> {
+    public class GeocachesTask extends AsyncTask<Double, Integer, Void> {
+
+        private blueharvest.geocaching.soap.objects.geocache.geocaches geocaches;
 
         /**
          * Override this method to perform a computation on a background thread. The
@@ -354,35 +533,51 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
          * This method can call {@link #publishProgress} to publish updates
          * on the UI thread.
          *
-         * @param locations The parameters of the task.
+         * @param params The parameters of the task.
+         *               params[0] is latitude, params[1] is longitude, and params[2] is distance
          * @return A result, defined by the subclass of this task.
          * @see #onPreExecute()
          * @see #onPostExecute
          * @see #publishProgress
          */
         @Override
-        protected Void doInBackground(Location... locations) {
-            for (int i = 0; i < locations.length; i++) { // should only be one
-                double myLatitude = locations[i].getLatitude();
-                double myLongitude = locations[i].getLongitude();
-                // get the geocaches from around the location coordinates here
-                geocaches = new blueharvest.geocaching.soap.objects.geocache.geocaches(
-                        myLatitude, myLongitude, distance);
-            }
+        protected Void doInBackground(Double... params) {
+            geocaches = new blueharvest.geocaching.soap.objects.geocache.geocaches(
+                    params[0], params[1], params[2]);
             return null;
         }
 
+        @Override
         protected void onProgressUpdate(Integer... progress) {
             //setProgressPercent(progress[0]);
         }
 
-        protected void onPostExecute(Long result) {
-            //showDialog("something");
+        /**
+         * set up the geocache markers
+         *
+         * @param result
+         */
+        @Override
+        protected void onPostExecute(Void result) {
+            if (geocaches != null) { // null check
+                for (blueharvest.geocaching.soap.objects.geocache g : geocaches) {
+                    map.addMarker(new MarkerOptions().position(
+                            new LatLng(g.getLocation().getLatitude().getDecimalDegrees(),
+                                    g.getLocation().getLongitude().getDecimalDegrees()))
+                            .title(g.getName())
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                }
+            } else if (geocaches == null) { // the nearby geocaches failed
+                Toast.makeText(getApplicationContext(),
+                        "Nearby geocaches is not available.",
+                        Toast.LENGTH_SHORT).show();
+            }
         }
 
     }
 
-    public class AddGeocacheTask extends AsyncTask<blueharvest.geocaching.soap.objects.geocache, Void, Boolean> {
+    public class AddGeocacheTask
+            extends AsyncTask<blueharvest.geocaching.soap.objects.geocache, Void, Boolean> {
 
         /**
          * Override this method to perform a computation on a background thread. The
@@ -400,12 +595,25 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
          */
         @Override
         protected Boolean doInBackground(blueharvest.geocaching.soap.objects.geocache... params) {
-            Log.d(TAG, params[0].getName());
+            //Log.d(TAG, params[0].getName());
             try {
                 return blueharvest.geocaching.soap.objects.geocache.insert(params[0]);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
-                return false;
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result == null) { // an exception occurred in the web service call
+                Toast.makeText(getApplicationContext(),
+                        "Add Geocache is not available. Please try again later.",
+                        Toast.LENGTH_SHORT).show();
+            } else if (!result) { // the web service returned false, the insert failed
+                Toast.makeText(getApplicationContext(),
+                        "The Geocache could not be added. Please try again later.",
+                        Toast.LENGTH_SHORT).show();
             }
         }
 
