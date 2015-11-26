@@ -16,6 +16,15 @@
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:contentDescription="@string/error_the_scream"
-        android:src="@drawable/the_scream"/>
+        android:contentDescription="@string/error_image_content_description"
+        android:src="@drawable/lego_star_wars_chewbacca"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/error_message"
+        android:id="@+id/message"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>

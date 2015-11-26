@@ -40,7 +40,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * a suggested random code (blueharvest-0.0.3+ required). Spinner controls are used for enumerating
  * values for size, terrain, and difficulty. The values for the enumerations are found hard-coded
  * in each respective .xml resource file in a string array and accessible through an adapter.
- * <p/>
+ * <p>
  * This activity then directs the usee to the view geocache activity.
  * todo: validation, handle no location, etc.
  *
@@ -211,7 +211,15 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         }
     }
 
-    public void handleNewLocation(Location location) {
+    /**
+     * Called when the location has changed.
+     * <p>
+     * <p> There are no restrictions on the use of the supplied Location object.
+     *
+     * @param location The new location, as a Location object.
+     */
+    @Override
+    public void onLocationChanged(Location location) {
         Log.d(TAG, location.toString());
         // Showing the current location in Google Map
         map.moveCamera(CameraUpdateFactory.newLatLng(
@@ -279,18 +287,6 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
     }
 
     /**
-     * Called when the location has changed.
-     * <p/>
-     * <p> There are no restrictions on the use of the supplied Location object.
-     *
-     * @param location The new location, as a Location object.
-     */
-    @Override
-    public void onLocationChanged(Location location) {
-        handleNewLocation(location);
-    }
-
-    /**
      * Called when the provider status changes. This method is called when
      * a provider is unable to fetch a location or if the provider has recently
      * become available after a period of unavailability.
@@ -305,11 +301,11 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
      *                 provider is currently available.
      * @param extras   an optional Bundle which will contain provider specific
      *                 status variables.
-     *                 <p/>
+     *                 <p>
      *                 <p> A number of common key/value pairs for the extras Bundle are listed
      *                 below. Providers that use any of the keys on this list must
      *                 provide the corresponding value as described below.
-     *                 <p/>
+     *                 <p>
      *                 <ul>
      *                 <li> satellites - the number of satellites used to derive the fix
      */
@@ -350,7 +346,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
          * Override this method to perform a computation on a background thread. The
          * specified parameters are the parameters passed to {@link #execute}
          * by the caller of this task.
-         * <p/>
+         * <p>
          * This method can call {@link #publishProgress} to publish updates
          * on the UI thread.
          *
@@ -372,23 +368,26 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
             return null;
         }
 
+        @Override
         protected void onProgressUpdate(Integer... progress) {
             //setProgressPercent(progress[0]);
         }
 
-        protected void onPostExecute(Long result) {
+        @Override
+        protected void onPostExecute(Void result) {
             //showDialog("something");
         }
 
     }
 
-    public class AddGeocacheTask extends AsyncTask<blueharvest.geocaching.soap.objects.geocache, Void, Boolean> {
+    public class AddGeocacheTask
+            extends AsyncTask<blueharvest.geocaching.soap.objects.geocache, Void, Boolean> {
 
         /**
          * Override this method to perform a computation on a background thread. The
          * specified parameters are the parameters passed to {@link #execute}
          * by the caller of this task.
-         * <p/>
+         * <p>
          * This method can call {@link #publishProgress} to publish updates
          * on the UI thread.
          *
@@ -400,7 +399,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
          */
         @Override
         protected Boolean doInBackground(blueharvest.geocaching.soap.objects.geocache... params) {
-            Log.d(TAG, params[0].getName());
+            //Log.d(TAG, params[0].getName());
             try {
                 return blueharvest.geocaching.soap.objects.geocache.insert(params[0]);
             } catch (Exception e) {
