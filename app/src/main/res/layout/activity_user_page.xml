@@ -92,7 +92,7 @@
                 android:ems="10"
                 android:id="@+id/searchRad"
                 android:layout_weight="1"
-                android:hint="in miles" />
+                android:hint="in Km" />
         </LinearLayout>
 
         <Button

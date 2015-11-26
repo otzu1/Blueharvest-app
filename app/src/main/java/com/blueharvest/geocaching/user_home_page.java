@@ -1,6 +1,7 @@
 package com.blueharvest.geocaching;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -23,15 +24,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Marker;
 
 public class user_home_page extends AppCompatActivity implements LocationListener {
 
     private GoogleMap mMap;
     private final static int MY_LOCATION_PERMISSION = 1;
-    private double distance = 10; // km
     double searchRadius = 0.0;
     double searchLat = 0.0;
     double searchLon = 0.0;
+    private MarkerOptions currentMarker;
 
     private SearchTask mSearchTask = null;
 
@@ -51,7 +53,14 @@ public class user_home_page extends AppCompatActivity implements LocationListene
 
         searchRadius = getIntent().getDoubleExtra("SearchRad", 0.00);
         searchLat = getIntent().getDoubleExtra("SearchLat", 0.00);
-        searchLon = getIntent().getDoubleExtra("SearchLon", 0.00);
+        searchLon = getIntent().getDoubleExtra("SearchLong", 0.00);
+
+        String a = "Latitude ";
+        String b = "Longitude ";
+        String c = "Search Radius ";
+        Log.d("blueharvest", a.concat(String.valueOf(searchLat)));
+        Log.d("blueharvest", b.concat(String.valueOf(searchLon)));
+        Log.d("blueharvest", c.concat(String.valueOf(searchRadius)));
 
         View mMapView = findViewById(R.id.user_home_content_form);
 
@@ -101,10 +110,11 @@ public class user_home_page extends AppCompatActivity implements LocationListene
         });
 
         // Set a marker at the center of the search location
-        mMap.addMarker(new MarkerOptions()
+        currentMarker = new MarkerOptions()
                 .position(new LatLng(searchLat, searchLon))
                 .title("Search Center")
-                .snippet("Center of Search"));
+                .snippet("Center of Search");
+        mMap.addMarker(currentMarker);
 
     }
 
@@ -162,6 +172,20 @@ public class user_home_page extends AppCompatActivity implements LocationListene
             // Enabling MyLocation Layer of Google Map
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setZoomControlsEnabled(true);
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    if (!marker.equals(currentMarker)) {
+
+                        Intent cacheIntent = new Intent(user_home_page.this, ViewGeocacheActivity.class);
+                        cacheIntent.putExtra("code", marker.getSnippet());
+                        startActivity(cacheIntent);
+                    }
+
+                    return true;
+                }
+            });
 
 
             // Getting LocationManager object from System Service LOCATION_SERVICE
@@ -251,17 +275,22 @@ public class user_home_page extends AppCompatActivity implements LocationListene
         @Override
         protected void onPostExecute(Void result) {
             // Generate the markers on the map
-            for(blueharvest.geocaching.soap.objects.geocache geocache : gs) {
-                mMap.addMarker(new MarkerOptions()
+            if (gs != null) {
+
+                for(blueharvest.geocaching.soap.objects.geocache geocache : gs)
+                    mMap.addMarker(new MarkerOptions()
                         .position(new LatLng(geocache.getLocation().getLatitude().getDecimalDegrees(),
                                 geocache.getLocation().getLongitude().getDecimalDegrees()))
                         .title(geocache.getName())
                         .snippet(geocache.getCode()));
 
                 Log.d("user home page", "Geocache found");
-            }
 
-            Log.d("user home page", "Geocache not found");
+            } else {
+
+                Log.d("user home page", "Geocache not found");
+
+            }
 
             mSearchTask = null;
         }
