@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
@@ -21,8 +20,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class user_home_page extends AppCompatActivity implements LocationListener {
@@ -30,6 +29,9 @@ public class user_home_page extends AppCompatActivity implements LocationListene
     private GoogleMap mMap;
     private final static int MY_LOCATION_PERMISSION = 1;
     private double distance = 10; // km
+    double searchRadius = 0.0;
+    double searchLat = 0.0;
+    double searchLon = 0.0;
 
     private SearchTask mSearchTask = null;
 
@@ -47,9 +49,9 @@ public class user_home_page extends AppCompatActivity implements LocationListene
         /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);*/
 
-        Double searchRadius = getIntent().getDoubleExtra("SearchRad", 0.00);
-        Double searchLat = getIntent().getDoubleExtra("SearchLat", 0.00);
-        Double searchLon = getIntent().getDoubleExtra("SearchLon", 0.00);
+        searchRadius = getIntent().getDoubleExtra("SearchRad", 0.00);
+        searchLat = getIntent().getDoubleExtra("SearchLat", 0.00);
+        searchLon = getIntent().getDoubleExtra("SearchLon", 0.00);
 
         View mMapView = findViewById(R.id.user_home_content_form);
 
@@ -81,14 +83,42 @@ public class user_home_page extends AppCompatActivity implements LocationListene
             }
         }
 
-        Location center = new Location ("New");
-        center.setLatitude(searchLat);
-        center.setLongitude(searchLon);
-        //mSearchTask = new SearchTask(center);
-        new SearchTask().execute(center);
+        startSearchTask(searchLat, searchLon);
+
+        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+
+            private float curZoom = -1;
+
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                if (cameraPosition.zoom != curZoom) {
+                    curZoom = cameraPosition.zoom;
+
+                    startSearchTask(searchLat, searchLon);
+                }
+
+            }
+        });
+
+        // Set a marker at the center of the search location
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(searchLat, searchLon))
+                .title("Search Center")
+                .snippet("Center of Search"));
 
     }
 
+    public void startSearchTask(Double lat, Double lon) {
+
+        if (mSearchTask == null) {
+            Location searchCenter = new Location ("Newer");
+            searchCenter.setLatitude(lat);
+            searchCenter.setLongitude(lon);
+            mSearchTask = new SearchTask();
+            mSearchTask.execute(searchCenter);
+        }
+
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -132,6 +162,7 @@ public class user_home_page extends AppCompatActivity implements LocationListene
             // Enabling MyLocation Layer of Google Map
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setZoomControlsEnabled(true);
+
 
             // Getting LocationManager object from System Service LOCATION_SERVICE
             LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -206,12 +237,13 @@ public class user_home_page extends AppCompatActivity implements LocationListene
 
         @Override
         protected Void doInBackground(Location... locations) {
+
             for (int i = 0; i < locations.length; i++) { // should only be one
                 double myLatitude = locations[i].getLatitude();
                 double myLongitude = locations[i].getLongitude();
                 // get the geocaches from around the location coordinates here
                 gs = new blueharvest.geocaching.soap.objects.geocache.geocaches(
-                        myLatitude, myLongitude, distance);
+                        myLatitude, myLongitude, searchRadius);
             }
             return null;
         }
@@ -220,12 +252,18 @@ public class user_home_page extends AppCompatActivity implements LocationListene
         protected void onPostExecute(Void result) {
             // Generate the markers on the map
             for(blueharvest.geocaching.soap.objects.geocache geocache : gs) {
-                Marker marker = mMap.addMarker(new MarkerOptions()
+                mMap.addMarker(new MarkerOptions()
                         .position(new LatLng(geocache.getLocation().getLatitude().getDecimalDegrees(),
                                 geocache.getLocation().getLongitude().getDecimalDegrees()))
                         .title(geocache.getName())
                         .snippet(geocache.getCode()));
+
+                Log.d("user home page", "Geocache found");
             }
+
+            Log.d("user home page", "Geocache not found");
+
+            mSearchTask = null;
         }
 
         @Override

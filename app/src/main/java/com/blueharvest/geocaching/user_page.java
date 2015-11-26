@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -161,6 +160,10 @@ public class user_page extends AppCompatActivity implements LocationListener {
         Double searchRad = Double.parseDouble(mSearchRad.getText().toString());
         Double searchLat = Double.parseDouble(mLatitude.getText().toString());
         Double searchLong = Double.parseDouble(mLongitude.getText().toString());
+        String a = "Latitude ";
+        String b = "Longitude ";
+        Log.d("blueharvest", a.concat(searchLat.toString()));
+        Log.d("blueharvest", b.concat(searchLong.toString()));
         searchIntent.putExtra("SearchRad", searchRad);
         searchIntent.putExtra("SearchLat", searchLat);
         searchIntent.putExtra("SearchLong", searchLong);
@@ -176,10 +179,12 @@ public class user_page extends AppCompatActivity implements LocationListener {
 
     protected void openSettings() {
         finish();
+        startActivity(new Intent(user_page.this, SettingsActivity.class));
     }
 
     protected void openHelp() {
         finish();
+        startActivity(new Intent(user_page.this, HelpActivity.class));
     }
 
     @Override
