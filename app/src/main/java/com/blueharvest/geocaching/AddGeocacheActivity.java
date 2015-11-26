@@ -339,7 +339,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
                         null, ((EditText) findViewById(R.id.name)).getText().toString(),
                         Double.valueOf(((EditText) findViewById(R.id.latitude)).getText().toString()),
                         Double.valueOf(((EditText) findViewById(R.id.longitude)).getText().toString()),
-                        3, null),
+                        -1, null), // altitude
                 null);
     }
 
@@ -394,15 +394,21 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         }
     }
 
+    /**
+     * do this preferably once so that the user can edit the values without interference
+     * @param latitude
+     * @param longitude
+     */
     private void handleLocation(double latitude, double longitude) {
         // clear the map
         map.clear();
+        // map type
+        map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         // Showing the current location in Google Map
         map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(latitude, longitude)));
         // Zoom in the Google Map
         map.animateCamera(CameraUpdateFactory.zoomTo(15));
         // Geocache Latitude and Longitude
-        // only do this if the entries are blank in case the user changed the values already
         if (((EditText) findViewById(R.id.latitude)).getText().toString().isEmpty()
                 && ((EditText) findViewById(R.id.longitude)).getText().toString().isEmpty()) {
             ((EditText) findViewById(R.id.latitude)).setText(String.valueOf(
