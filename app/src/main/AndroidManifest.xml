@@ -110,6 +110,10 @@
             android:name=".ErrorActivity"
             android:label="Error">
         </activity>
+        <activity
+            android:name=".LogoutActivity"
+            android:label="Logout">
+        </activity>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
