@@ -24,7 +24,24 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+/**
+ * This activity is like a dashboard for the user and offers a map to view current
+ * location, entry for latitude and longitude, search based on latitude, longitude, and
+ * radius later displayed in either a map view or a list view of the results. Additionally,
+ * this activity offers the ability to add a geocache, go to help or settings, and to log out.
+ *
+ * todo: validate latitude range (regex works well for this)
+ * todo: validate longitude range (regex works well for this)
+ * todo: validate radius range (regex could do the trick)
+ * todo: marker for latitude and longitude entry (idea)
+ * todo: move map after latitude and longitude entry (idea)
+ * todo: validation before any search button (map or list)
+ * todo: logout button
+ */
 public class user_page extends AppCompatActivity implements LocationListener {
+
+    // for logging
+    public static final String TAG = "blueharvest:: " + AddGeocacheActivity.class.getSimpleName();
 
     private GoogleMap mMap;
     private EditText mLatitude;
@@ -36,7 +53,7 @@ public class user_page extends AppCompatActivity implements LocationListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_page);
-        Log.d("blueharvest", "user_page.java");
+        //Log.d(TAG, "user_page.java");
 
         mLatitude = (EditText) findViewById(R.id.latitude);
         mLongitude = (EditText) findViewById(R.id.longitude);
@@ -48,8 +65,7 @@ public class user_page extends AppCompatActivity implements LocationListener {
         mSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("blueharvest", "search button clicked");
-                // this is never reached as far as I can see in the log
+                //Log.d(TAG, "search button clicked");
                 searchGeocache();
             }
         });
@@ -58,7 +74,7 @@ public class user_page extends AppCompatActivity implements LocationListener {
         mAddGeocache.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("blueharvest", "add geocache button clicked");
+                //Log.d(TAG, "add geocache button clicked");
                 addGeocache();
             }
         });
@@ -67,8 +83,7 @@ public class user_page extends AppCompatActivity implements LocationListener {
         mListSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("blueharvest", "search list button clicked");
-                // this is never reached as far as I can see in the log
+                //Log.d(TAG, "search list button clicked");
                 listSearchGeocache();
             }
         });
@@ -105,12 +120,12 @@ public class user_page extends AppCompatActivity implements LocationListener {
                         @Override
                         public void onClick(View view) {
                             // Request the permission
+                            // todo: this causes error (api min 23)
                             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                                     MY_LOCATION_PERMISSION);
                         }
                     }).show();
                 } else {
-
                     requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                             MY_LOCATION_PERMISSION);
                 }
@@ -165,7 +180,7 @@ public class user_page extends AppCompatActivity implements LocationListener {
     }
 
     protected void listSearchGeocache() {
-        Log.d("blueharvest.user_page", "listSearchGeocache called");
+        //Log.d(TAG, "listSearchGeocache called");
         Intent listSearchIntent = new Intent(user_page.this, ViewGeocachesActivity.class);
         Double searchRad = Double.parseDouble(mSearchRad.getText().toString());
         Double searchLat = Double.parseDouble(mLatitude.getText().toString());
@@ -175,10 +190,10 @@ public class user_page extends AppCompatActivity implements LocationListener {
         listSearchIntent.putExtra("SearchLong", searchLong);
         startActivity(listSearchIntent);
         finish();
-
     }
+
     protected void searchGeocache() {
-        Log.d("blueharvest.user_page", "searchGeocache called");
+        //Log.d(TAG, "searchGeocache called");
         Intent searchIntent = new Intent(user_page.this, user_home_page.class);
         Double searchRad = Double.parseDouble(mSearchRad.getText().toString());
         Double searchLat = Double.parseDouble(mLatitude.getText().toString());
@@ -191,7 +206,7 @@ public class user_page extends AppCompatActivity implements LocationListener {
     }
 
     protected void addGeocache() {
-        Log.d("blueharvest.user_page", "addGeocache called");
+        //Log.d(TAG, "addGeocache called");
         finish();
         startActivity(new Intent(user_page.this, AddGeocacheActivity.class));
     }
@@ -235,22 +250,18 @@ public class user_page extends AppCompatActivity implements LocationListener {
                 new java.text.DecimalFormat("##0.#######").format(latitude)));
         ((EditText) findViewById(R.id.longitude)).setText(String.valueOf(
                 new java.text.DecimalFormat("##0.#######").format(longitude)));
-
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-
     }
 
 }

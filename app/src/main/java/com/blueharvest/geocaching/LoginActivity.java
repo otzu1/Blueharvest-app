@@ -42,7 +42,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private static final int REQUEST_READ_CONTACTS = 0;
     private static final int minPasswordLen = 6;
-    private static final int minUsernameLen = 6;
+    private static final int minUsernameLen = 5; // jmb 2015-11-27: changed from 6 to 5
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -176,9 +176,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
 
-        // jmb: I put this here to test a username and password which is not strict
-        //cancel = false; // todo: remove after testing!
-
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -193,10 +190,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isUsernameValid(String username) {
+        // todo: this should use authentication, too
         return username.length() >= minUsernameLen;
     }
 
     private boolean isPasswordValid(String password) {
+        // todo: this should use authentication, too
         return password.length() > minPasswordLen;
     }
 
@@ -261,12 +260,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             emails.add(cursor.getString(ProfileQuery.ADDRESS));
             cursor.moveToNext();
         }
-
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
     }
 
     private interface ProfileQuery {
@@ -274,7 +271,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 ContactsContract.CommonDataKinds.Email.ADDRESS,
                 ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
         };
-
         int ADDRESS = 0;
         int IS_PRIMARY = 1;
     }
@@ -296,31 +292,29 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             boolean success = false;
-
             try {
                 success =
                         blueharvest.geocaching.soap.objects.user.auth(mUsername, mPassword);
+                // if the user logs in, save/confirm an identifier for other features they may use
+                // we won't waste our time otherwise and only if they are auth'ed
+                // keep this here off the main thread or do another async task
+                if (success) {
+                    String me = blueharvest.geocaching.soap.objects.user.get(
+                            mUsername, mPassword).getId().toString();
+                    SharedPreferences pref // 0 - for private mode
+                            = getApplicationContext().getSharedPreferences("blueharvest", 0);
+                    SharedPreferences.Editor editor = pref.edit();
+                    // instead of checking if an identifier exists and all that jazz,
+                    // we'll just clear the preference (that one only)
+                    // and add the currently auth'ed to exist.
+                    editor.remove("me");
+                    editor.apply();
+                    editor.putString("me", me);
+                    editor.apply();
+                }
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-
-            // if the user logs in, save/confirm an identifier for other features they may use
-            // we won't waste our time otherwise and only if they are auth'ed
-            if (success) {
-                String me = blueharvest.geocaching.soap.objects.user.get(
-                        mUsername, mPassword).getId().toString();
-                SharedPreferences pref // 0 - for private mode
-                        = getApplicationContext().getSharedPreferences("blueharvest", 0);
-                SharedPreferences.Editor editor = pref.edit();
-                // instead of checking if an identifier exists and all that jazz,
-                // we'll just clear the preference (that one only)
-                // and add the currently auth'ed to exist.
-                editor.remove("me");
-                editor.apply();
-                editor.putString("me", me);
-                editor.apply();
-            }
-
             return success;
         }
 
@@ -328,7 +322,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             showProgress(false);
-
             if (success) {
                 finish();
                 startActivity(new Intent(LoginActivity.this, user_page.class));

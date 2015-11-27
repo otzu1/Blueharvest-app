@@ -227,7 +227,6 @@ public class ViewGeocacheActivity extends FragmentActivity {
                                 g.getLocation().getLongitude().getDecimalDegrees()))
                         .title(g.getName()));
                 // set up widgets
-
                 ((TextView) findViewById(R.id.latitude)).setText(
                         g.getLocation().getLatitude().toSexigesimal(
                                 location.coordinate.type.latitude));
