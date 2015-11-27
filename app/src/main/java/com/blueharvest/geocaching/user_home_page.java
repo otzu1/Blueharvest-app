@@ -26,6 +26,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Marker;
 
+/**
+ * This activity displays geocaches on a map.
+ * todo: fixme ... the map defaults to current location rather than the center point
+ * todo: fixme ... conflict between current location and search result location
+ * todo: this can be duplicated two ways:
+ * 1. the user's current location is null (onLocationChanged will never be called)
+ * 2. the user's current location changes (onLocationChanged called again)
+ */
 public class user_home_page extends AppCompatActivity implements LocationListener {
 
     private GoogleMap mMap;
@@ -38,6 +46,8 @@ public class user_home_page extends AppCompatActivity implements LocationListene
     private SearchTask mSearchTask = null;
 
     private static final String logCat = "user home page";
+    // for logging
+    public static final String TAG = "blueharvest:: " + AddGeocacheActivity.class.getSimpleName();
     blueharvest.geocaching.soap.objects.geocache.geocaches results;
 
     @Override
@@ -129,6 +139,7 @@ public class user_home_page extends AppCompatActivity implements LocationListene
         }
 
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
