@@ -68,8 +68,8 @@ public class ViewGeocacheActivity extends FragmentActivity {
 
         // get the geocache and set up the view in the onpostexecute function
         try {
-            new GeocacheTask().execute(getIntent().getStringExtra("code"));
-            //new GeocacheTask().execute("BH13GC7"); // todo: testing
+            //new GeocacheTask().execute(getIntent().getStringExtra("code"));
+            new GeocacheTask().execute("BH13GC7"); // todo: testing
         } catch (Exception e) { // something went wrong, display a short message
             Toast.makeText(getApplicationContext(),
                     "Geocache could not be fetched. Please try again later!",
@@ -78,11 +78,10 @@ public class ViewGeocacheActivity extends FragmentActivity {
 
         // favorite custom checkbox
         final CheckBox favorite = (CheckBox) findViewById(R.id.favorite);
-        // todo: default value (another async task)
         favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new FavoriteTask().execute(
+                new DoFavoriteTask().execute(
                         getApplicationContext().getSharedPreferences(
                                 "blueharvest", MODE_PRIVATE).getString("me", null),
                         ((TextView) findViewById(R.id.geocacheid)).getText().toString(),
@@ -92,11 +91,10 @@ public class ViewGeocacheActivity extends FragmentActivity {
 
         // found custom checkbox
         final CheckBox found = (CheckBox) findViewById(R.id.found);
-        // todo: default value (another async task)
         found.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new FoundTask().execute(
+                new DoFoundTask().execute(
                         getApplicationContext().getSharedPreferences(
                                 "blueharvest", MODE_PRIVATE).getString("me", null),
                         ((TextView) findViewById(R.id.geocacheid)).getText().toString(),
@@ -229,12 +227,20 @@ public class ViewGeocacheActivity extends FragmentActivity {
                                 g.getLocation().getLongitude().getDecimalDegrees()))
                         .title(g.getName()));
                 // set up widgets
+
                 ((TextView) findViewById(R.id.latitude)).setText(
                         g.getLocation().getLatitude().toSexigesimal(
                                 location.coordinate.type.latitude));
                 ((TextView) findViewById(R.id.longitude)).setText(
                         g.getLocation().getLongitude().toSexigesimal(
                                 location.coordinate.type.longitude));
+                // userid for custom checkboxes
+                final String me = getApplicationContext().getSharedPreferences(
+                        "blueharvest", MODE_PRIVATE).getString("me", null);
+                // favorite default value
+                new IsFavoriteTask().execute(g.getId(), java.util.UUID.fromString(me));
+                // found default value
+                new IsFoundTask().execute(g.getId(), java.util.UUID.fromString(me));
                 ((TextView) findViewById(R.id.name)).setText(g.getName());
                 ((TextView) findViewById(R.id.code)).setText(g.getCode());
                 ((TextView) findViewById(R.id.type)).setText(
@@ -274,7 +280,7 @@ public class ViewGeocacheActivity extends FragmentActivity {
      * Params, Progress, Result
      * @since 2015-11-24
      */
-    public class FavoriteTask extends AsyncTask<String, Void, Boolean> {
+    public class DoFavoriteTask extends AsyncTask<String, Void, Boolean> {
 
         /**
          * Override this method to perform a computation on a background thread. The
@@ -320,13 +326,64 @@ public class ViewGeocacheActivity extends FragmentActivity {
     }
 
     /**
-     * when found is checked, user wants to set this geocache as found and vice versa
-     *
      * @see <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsycncTask</a>
      * Params, Progress, Result
      * @since 2015-11-24
      */
-    public class FoundTask extends AsyncTask<String, Void, Boolean> {
+    public class IsFavoriteTask extends AsyncTask<java.util.UUID, Void, Boolean> {
+
+        private boolean b;
+
+        /**
+         * Override this method to perform a computation on a background thread. The
+         * specified parameters are the parameters passed to {@link #execute}
+         * by the caller of this task.
+         * <p/>
+         * This method can call {@link #publishProgress} to publish updates
+         * on the UI thread.
+         *
+         * @param params The parameters of the task.
+         * @return A result, defined by the subclass of this task.
+         * @see #onPreExecute()
+         * @see #onPostExecute
+         * @see #publishProgress
+         */
+        @Override
+        protected Boolean doInBackground(java.util.UUID... params) {
+            try {
+                // params[0] = geocacheid and params[1] = userid
+                b = blueharvest.geocaching.soap.objects.geocache.isFavorite(params[0], params[1]);
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        /**
+         * handle any problems
+         *
+         * @param result
+         */
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (!result) { // something went wrong, display a short message
+                Toast.makeText(getApplicationContext(),
+                        "Geocache Favorite feature (default) not available. Please try again later.",
+                        Toast.LENGTH_SHORT).show();
+            } else if (result) {
+                ((CheckBox) findViewById(R.id.favorite)).setChecked(b);
+            }
+        }
+
+    }
+
+    /**
+     * @see <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsycncTask</a>
+     * Params, Progress, Result
+     * @since 2015-11-24
+     */
+    public class DoFoundTask extends AsyncTask<String, Void, Boolean> {
 
         /**
          * Override this method to perform a computation on a background thread. The
@@ -367,6 +424,59 @@ public class ViewGeocacheActivity extends FragmentActivity {
                 Toast.makeText(getApplicationContext(),
                         "Geocache Found feature not available. Please try again later.",
                         Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+    /**
+     * @see <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsycncTask</a>
+     * Params, Progress, Result
+     * @since 2015-11-24
+     */
+    public class IsFoundTask extends AsyncTask<java.util.UUID, Void, Boolean> {
+
+        private boolean b;
+
+        /**
+         * Override this method to perform a computation on a background thread. The
+         * specified parameters are the parameters passed to {@link #execute}
+         * by the caller of this task.
+         * <p/>
+         * This method can call {@link #publishProgress} to publish updates
+         * on the UI thread.
+         *
+         * @param params The parameters of the task.
+         * @return A result, defined by the subclass of this task.
+         * @see #onPreExecute()
+         * @see #onPostExecute
+         * @see #publishProgress
+         */
+        @Override
+        protected Boolean doInBackground(java.util.UUID... params) {
+            try {
+                // params[0] = geocacheid and params[1] = userid
+                b = blueharvest.geocaching.soap.objects.geocache.isFound(params[0], params[1]);
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        /**
+         * handle any problems
+         *
+         * @param result
+         */
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (!result) { // something went wrong, display a short message
+                Toast.makeText(getApplicationContext(),
+                        "Geocache Favorite feature (default) not available. Please try again later.",
+                        Toast.LENGTH_SHORT).show();
+            } else if (result) {
+                ((CheckBox) findViewById(R.id.found)).setChecked(b);
             }
         }
 
