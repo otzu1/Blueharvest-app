@@ -66,12 +66,12 @@ public class ViewGeocacheActivity extends FragmentActivity {
         // map
         setUpMap();
 
-        // get the geocache and set up the view in the postexecute function
+        // get the geocache and set up the view in the onpostexecute function
         try {
             new GeocacheTask().execute(getIntent().getStringExtra("code"));
         } catch (Exception e) { // something went wrong, display a short message
             Toast.makeText(getApplicationContext(),
-                    "Geocache could not be fetched. Try again later.",
+                    "Geocache could not be fetched. Please try again later.",
                     Toast.LENGTH_SHORT).show();
         }
 
@@ -186,6 +186,7 @@ public class ViewGeocacheActivity extends FragmentActivity {
 
         private blueharvest.geocaching.concepts.geocache g;
 
+        @Override
         protected Void doInBackground(String... params) {
             try {
                 g = blueharvest.geocaching.soap.objects.geocache.get(params[0]);
@@ -227,11 +228,11 @@ public class ViewGeocacheActivity extends FragmentActivity {
                 ((TextView) findViewById(R.id.type)).setText(
                         getResources().getStringArray(R.array.geocache_types)[g.getType()]);
                 ((TextView) findViewById(R.id.size)).setText(
-                        getResources().getStringArray(R.array.geocache_sizes)[g.getType()]);
+                        getResources().getStringArray(R.array.geocache_sizes)[g.getSize()]);
                 ((TextView) findViewById(R.id.terrain)).setText(
-                        getResources().getStringArray(R.array.geocache_terrain)[g.getType()]);
+                        getResources().getStringArray(R.array.geocache_terrain)[g.getTerrain()]);
                 ((TextView) findViewById(R.id.difficulty)).setText(
-                        getResources().getStringArray(R.array.geocache_difficulty)[g.getType()]);
+                        getResources().getStringArray(R.array.geocache_difficulty)[g.getDifficulty()]);
                 // todo: fade out long descriptions and offer a button to "read more"
                 ((TextView) findViewById(R.id.description)).setText(g.getDescription());
                 // todo: creator image (avatar)
@@ -245,10 +246,12 @@ public class ViewGeocacheActivity extends FragmentActivity {
                 ((TextView) findViewById(R.id.anniversary)).setText(g.getAnniversary().toString());
                 ((TextView) findViewById(R.id.geocacheid)).setText(g.getId().toString());
                 ((TextView) findViewById(R.id.logbookid)).setText(g.getLogbook().getId().toString());
-            } else { // something went wrong, display a short message
+            } else { // something went wrong, display a short message and disable/hide log button
                 Toast.makeText(getApplicationContext(),
-                        "Geocache could not be fetched. Try again later.",
+                        "Geocache could not be fetched. Please try again later.",
                         Toast.LENGTH_SHORT).show();
+                findViewById(R.id.log).setEnabled(false);
+                findViewById(R.id.log).setVisibility(View.INVISIBLE);
             }
         }
 
@@ -277,45 +280,31 @@ public class ViewGeocacheActivity extends FragmentActivity {
          */
         @Override
         protected Boolean doInBackground(Boolean... params) {
-            // get user identifier from shared preferences
-            String me = getApplicationContext().getSharedPreferences(
-                    "blueharvest", MODE_PRIVATE).getString("me", null);
-            if (me != null) {
-                if (params[0]) { // favorite is checked, user wants to favorite this geocache
-                    Log.d(TAG, "favorite me!");
-                    try {
-                        // todo: no such method exists in the library at this time
-                        //blueharvest.geocaching.soap.objects.geocache.favorite(java.util.UUID.fromString(me));
-                        return true;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (!params[0]) { // favorite is unchecked, user wants to un-favorite this geocache
-                    Log.d(TAG, "un-favorite me!");
-                    try {
-                        // todo: no such method exists in the library at this time
-                        //blueharvest.geocaching.soap.objects.geocache.unfavorite(java.util.UUID.fromString(me));
-                        return false;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+            try {
+                // todo: no such method exists in the library at this time (coming soon)
+                // by geocacheid ... but we have the code ...
+                /*return blueharvest.geocaching.soap.objects.user.relateFavoriteGeocache(
+                        java.util.UUID.fromString(getApplicationContext().getSharedPreferences(
+                                "blueharvest", MODE_PRIVATE).getString("me", null)),
+                        getIntent().getStringExtra("code"), params[0]);*/
+                return true; // todo: remove this when the feature is implemented
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
             }
-            return null; // something went wrong, deal with it in onPostExecute
         }
 
         /**
-         * check or uncheck the favorite checkbox
-         * if an error occured (null result), then revert check
+         * handle any problems
          *
          * @param result
          */
         @Override
         protected void onPostExecute(Boolean result) {
-            if (result == null) {
-                ((CheckBox) findViewById(R.id.favorite)).setChecked(!result);
+            if (!result) {
                 // something went wrong, display a short message
-                Toast.makeText(getApplicationContext(), "Favorite not available. Try again later.",
+                Toast.makeText(getApplicationContext(),
+                        "Geocache Favorite feature not available. Please try again later.",
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -323,6 +312,8 @@ public class ViewGeocacheActivity extends FragmentActivity {
     }
 
     /**
+     * when found is checked, user wants to set this geocache as found and vice versa
+     *
      * @see <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsycncTask</a>
      * Params, Progress, Result
      * @since 2015-11-24
@@ -345,45 +336,31 @@ public class ViewGeocacheActivity extends FragmentActivity {
          */
         @Override
         protected Boolean doInBackground(Boolean... params) {
-            // get user identifier from shared preferences
-            String me = getApplicationContext().getSharedPreferences(
-                    "blueharvest", MODE_PRIVATE).getString("me", null);
-            if (me != null) {
-                if (params[0]) { // found is checked, user wants to set this geocache as found
-                    Log.d(TAG, "found me!");
-                    try {
-                        // todo: no such method exists in the library at this time
-                        //blueharvest.geocaching.soap.objects.geocache.found(java.util.UUID.fromString(me));
-                        return true;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (!params[0]) { // found is unchecked, user wants to set this geocache as unfound
-                    Log.d(TAG, "unfound me!");
-                    try {
-                        // todo: no such method exists in the library at this time
-                        //blueharvest.geocaching.soap.objects.geocache.unfound(java.util.UUID.fromString(me));
-                        return false;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+            try {
+                // todo: no such method exists in the library at this time (coming soon)
+                // by geocacheid ... but we have the code ...
+                /*return blueharvest.geocaching.soap.objects.user.relateFoundGeocache(
+                        java.util.UUID.fromString(getApplicationContext().getSharedPreferences(
+                                "blueharvest", MODE_PRIVATE).getString("me", null)),
+                        getIntent().getStringExtra("code"), params[0]);*/
+                return true; // todo: remove this when the feature is implemented
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
             }
-            return null; // something went wrong, deal with it in onPostExecute
         }
 
         /**
-         * check or uncheck the favorite checkbox
-         * if an error occured (null result), then revert check
+         * handle any problems here
          *
          * @param result
          */
         @Override
         protected void onPostExecute(Boolean result) {
-            if (result == null) {
-                ((CheckBox) findViewById(R.id.found)).setChecked(!result);
+            if (!result) {
                 // something went wrong, display a short message
-                Toast.makeText(getApplicationContext(), "Found not available. Try again later.",
+                Toast.makeText(getApplicationContext(),
+                        "Geocache Found feature not available. Please try again later.",
                         Toast.LENGTH_SHORT).show();
             }
         }
