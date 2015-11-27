@@ -12,10 +12,16 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This activity displays a list of Geocaches.
+ * todo: incorporate more details for each item
+ * todo: this activity is only an entry for list by location
+ * and should also be flexible to handle other lists as well
+ * (i.e. favorites and found geocaches)
+ */
 public class ViewGeocachesActivity extends AppCompatActivity {
 
     private double searchRadius = 0.0;
@@ -62,7 +68,7 @@ public class ViewGeocachesActivity extends AppCompatActivity {
     public void startSearchTask(Double lat, Double lon) {
 
         if (mSearchTask == null) {
-            Location searchCenter = new Location ("Newer");
+            Location searchCenter = new Location("Newer");
             searchCenter.setLatitude(lat);
             searchCenter.setLongitude(lon);
             mSearchTask = new SearchTask();
@@ -126,8 +132,3 @@ public class ViewGeocachesActivity extends AppCompatActivity {
         }
     }
 }
-
-
-
-
-
