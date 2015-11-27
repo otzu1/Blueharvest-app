@@ -69,27 +69,38 @@ public class ViewGeocacheActivity extends FragmentActivity {
         // get the geocache and set up the view in the onpostexecute function
         try {
             new GeocacheTask().execute(getIntent().getStringExtra("code"));
+            //new GeocacheTask().execute("BH13GC7"); // todo: testing
         } catch (Exception e) { // something went wrong, display a short message
             Toast.makeText(getApplicationContext(),
-                    "Geocache could not be fetched. Please try again later.",
+                    "Geocache could not be fetched. Please try again later!",
                     Toast.LENGTH_SHORT).show();
         }
 
         // favorite custom checkbox
         final CheckBox favorite = (CheckBox) findViewById(R.id.favorite);
+        // todo: default value (another async task)
         favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new FavoriteTask().execute(favorite.isChecked());
+                new FavoriteTask().execute(
+                        getApplicationContext().getSharedPreferences(
+                                "blueharvest", MODE_PRIVATE).getString("me", null),
+                        ((TextView) findViewById(R.id.geocacheid)).getText().toString(),
+                        String.valueOf(favorite.isChecked()));
             }
         });
 
         // found custom checkbox
         final CheckBox found = (CheckBox) findViewById(R.id.found);
+        // todo: default value (another async task)
         found.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new FoundTask().execute(found.isChecked());
+                new FoundTask().execute(
+                        getApplicationContext().getSharedPreferences(
+                                "blueharvest", MODE_PRIVATE).getString("me", null),
+                        ((TextView) findViewById(R.id.geocacheid)).getText().toString(),
+                        String.valueOf(found.isChecked()));
             }
         });
 
@@ -99,7 +110,8 @@ public class ViewGeocacheActivity extends FragmentActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ViewGeocacheActivity.this, AddLogbookEntryActivity.class);
-                intent.putExtra("logbookid", ((TextView) findViewById(R.id.geocacheid)).getText().toString());
+                intent.putExtra("logbookid", ((TextView) findViewById(R.id.logbookid)).getText().toString());
+                intent.putExtra("geocacheid", ((TextView) findViewById(R.id.geocacheid)).getText().toString());
                 intent.putExtra("code", ((TextView) findViewById(R.id.code)).getText().toString());
                 startActivity(intent);
             }
@@ -262,7 +274,7 @@ public class ViewGeocacheActivity extends FragmentActivity {
      * Params, Progress, Result
      * @since 2015-11-24
      */
-    public class FavoriteTask extends AsyncTask<Boolean, Void, Boolean> {
+    public class FavoriteTask extends AsyncTask<String, Void, Boolean> {
 
         /**
          * Override this method to perform a computation on a background thread. The
@@ -279,15 +291,12 @@ public class ViewGeocacheActivity extends FragmentActivity {
          * @see #publishProgress
          */
         @Override
-        protected Boolean doInBackground(Boolean... params) {
+        protected Boolean doInBackground(String... params) {
             try {
-                // todo: no such method exists in the library at this time (coming soon)
-                // by geocacheid ... but we have the code ...
-                /*return blueharvest.geocaching.soap.objects.user.relateFavoriteGeocache(
-                        java.util.UUID.fromString(getApplicationContext().getSharedPreferences(
-                                "blueharvest", MODE_PRIVATE).getString("me", null)),
-                        getIntent().getStringExtra("code"), params[0]);*/
-                return true; // todo: remove this when the feature is implemented
+                // params[0] = userid, params[1] = geocacheid, params[2] = true/false
+                return blueharvest.geocaching.soap.objects.user.relateFavoriteGeocache(
+                        java.util.UUID.fromString(params[0]), java.util.UUID.fromString(params[1]),
+                        Boolean.parseBoolean(params[2]));
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
@@ -301,8 +310,7 @@ public class ViewGeocacheActivity extends FragmentActivity {
          */
         @Override
         protected void onPostExecute(Boolean result) {
-            if (!result) {
-                // something went wrong, display a short message
+            if (!result) { // something went wrong, display a short message
                 Toast.makeText(getApplicationContext(),
                         "Geocache Favorite feature not available. Please try again later.",
                         Toast.LENGTH_SHORT).show();
@@ -318,7 +326,7 @@ public class ViewGeocacheActivity extends FragmentActivity {
      * Params, Progress, Result
      * @since 2015-11-24
      */
-    public class FoundTask extends AsyncTask<Boolean, Void, Boolean> {
+    public class FoundTask extends AsyncTask<String, Void, Boolean> {
 
         /**
          * Override this method to perform a computation on a background thread. The
@@ -335,15 +343,13 @@ public class ViewGeocacheActivity extends FragmentActivity {
          * @see #publishProgress
          */
         @Override
-        protected Boolean doInBackground(Boolean... params) {
+        protected Boolean doInBackground(String... params) {
             try {
-                // todo: no such method exists in the library at this time (coming soon)
-                // by geocacheid ... but we have the code ...
-                /*return blueharvest.geocaching.soap.objects.user.relateFoundGeocache(
-                        java.util.UUID.fromString(getApplicationContext().getSharedPreferences(
-                                "blueharvest", MODE_PRIVATE).getString("me", null)),
-                        getIntent().getStringExtra("code"), params[0]);*/
-                return true; // todo: remove this when the feature is implemented
+                // params[0] = userid, params[2] = geocacheid, params[2] = true/false
+                return blueharvest.geocaching.soap.objects.user.relateFoundGeocache(
+                        java.util.UUID.fromString(params[0]),
+                        java.util.UUID.fromString(params[1]),
+                        Boolean.valueOf(params[2]));
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
@@ -357,8 +363,7 @@ public class ViewGeocacheActivity extends FragmentActivity {
          */
         @Override
         protected void onPostExecute(Boolean result) {
-            if (!result) {
-                // something went wrong, display a short message
+            if (!result) { // something went wrong, display a short message
                 Toast.makeText(getApplicationContext(),
                         "Geocache Found feature not available. Please try again later.",
                         Toast.LENGTH_SHORT).show();
