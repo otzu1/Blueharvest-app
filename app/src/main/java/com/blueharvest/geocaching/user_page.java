@@ -160,10 +160,6 @@ public class user_page extends AppCompatActivity implements LocationListener {
         Double searchRad = Double.parseDouble(mSearchRad.getText().toString());
         Double searchLat = Double.parseDouble(mLatitude.getText().toString());
         Double searchLong = Double.parseDouble(mLongitude.getText().toString());
-        String a = "Latitude ";
-        String b = "Longitude ";
-        Log.d("blueharvest", a.concat(searchLat.toString()));
-        Log.d("blueharvest", b.concat(searchLong.toString()));
         searchIntent.putExtra("SearchRad", searchRad);
         searchIntent.putExtra("SearchLat", searchLat);
         searchIntent.putExtra("SearchLong", searchLong);
