@@ -95,12 +95,27 @@
                 android:hint="in Km" />
         </LinearLayout>
 
-        <Button
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Search"
-            android:id="@+id/buttonSearch"
-            android:layout_gravity="center_horizontal"/>
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.14">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Map Search"
+                android:id="@+id/buttonSearch"
+                android:layout_weight="0.49" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="List Search"
+                android:id="@+id/buttonListSearch"
+                android:layout_weight="0.49" />
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"

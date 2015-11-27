@@ -63,6 +63,16 @@ public class user_page extends AppCompatActivity implements LocationListener {
             }
         });
 
+        Button mListSearch = (Button) findViewById(R.id.buttonListSearch);
+        mListSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("blueharvest", "search list button clicked");
+                // this is never reached as far as I can see in the log
+                listSearchGeocache();
+            }
+        });
+
         Button mSettings = (Button) findViewById(R.id.buttonSettings);
         mSettings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,8 +164,21 @@ public class user_page extends AppCompatActivity implements LocationListener {
         }
     }
 
+    protected void listSearchGeocache() {
+        Log.d("blueharvest.user_page", "listSearchGeocache called");
+        Intent listSearchIntent = new Intent(user_page.this, ViewGeocachesActivity.class);
+        Double searchRad = Double.parseDouble(mSearchRad.getText().toString());
+        Double searchLat = Double.parseDouble(mLatitude.getText().toString());
+        Double searchLong = Double.parseDouble(mLongitude.getText().toString());
+        listSearchIntent.putExtra("SearchRad", searchRad);
+        listSearchIntent.putExtra("SearchLat", searchLat);
+        listSearchIntent.putExtra("SearchLong", searchLong);
+        startActivity(listSearchIntent);
+        finish();
+
+    }
     protected void searchGeocache() {
-        Log.d("blueharvest", "searchGeocache called");
+        Log.d("blueharvest.user_page", "searchGeocache called");
         Intent searchIntent = new Intent(user_page.this, user_home_page.class);
         Double searchRad = Double.parseDouble(mSearchRad.getText().toString());
         Double searchLat = Double.parseDouble(mLatitude.getText().toString());
@@ -168,7 +191,7 @@ public class user_page extends AppCompatActivity implements LocationListener {
     }
 
     protected void addGeocache() {
-        Log.d("blueharvest", "addGeocache called");
+        Log.d("blueharvest.user_page", "addGeocache called");
         finish();
         startActivity(new Intent(user_page.this, AddGeocacheActivity.class));
     }
