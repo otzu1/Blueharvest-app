@@ -1,10 +1,11 @@
 package com.blueharvest.geocaching;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v4.widget.TextViewCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +18,13 @@ import java.util.ArrayList;
 
 public class ViewLogbookEntriesActivity extends AppCompatActivity {
 
+    // for logging
+    public static final String TAG = "blueharvest:: " + AddGeocacheActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_logbook_entries);
-        // todo: populate listview of logbook entries
-        // I would love to have a more "book-like" presentation ...
-        // perhaps a turning page animation when the user swipes
-        // this activity from one "page" to the next.
         new LogbookEntriesTask().execute(
                 java.util.UUID.fromString("4D08BE88-655F-4D6D-A79A-E20565C4C40A"));
     }
@@ -37,6 +37,17 @@ public class ViewLogbookEntriesActivity extends AppCompatActivity {
     public class LogbookEntriesTask extends AsyncTask<java.util.UUID, Integer, Boolean> {
 
         private blueharvest.geocaching.soap.objects.logbook l;
+        private ProgressDialog pd;
+
+        public LogbookEntriesTask() {
+            pd = new ProgressDialog(ViewLogbookEntriesActivity.this);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            pd.setMessage("Fetching logbook entries, please wait.");
+            pd.show();
+        }
 
         @Override
         protected Boolean doInBackground(java.util.UUID... params) {
@@ -46,14 +57,15 @@ public class ViewLogbookEntriesActivity extends AppCompatActivity {
 
         @Override
         protected void onProgressUpdate(Integer... progress) {
-            //setProgressPercent(progress[0]);
+            //super.onProgressUpdate(progress);
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
             if (result && l != null && l.getEntries() != null) {
                 // Create the adapter to convert the array to views
-                LogbookEntriesAdapter a = new LogbookEntriesAdapter(getApplicationContext(), l.getEntries());
+                LogbookEntriesAdapter a = new LogbookEntriesAdapter(
+                        ViewLogbookEntriesActivity.this, l.getEntries());
                 // Attach the adapter to a ListView
                 ((ListView) findViewById(R.id.logbookentries)).setAdapter(a);
                 //for (blueharvest.geocaching.concepts.logbook.entry e : l.getEntries())
@@ -62,6 +74,7 @@ public class ViewLogbookEntriesActivity extends AppCompatActivity {
                         "Logbook feature not available. Please try again later.",
                         Toast.LENGTH_SHORT).show();
             }
+            if (pd.isShowing()) pd.dismiss();
         }
 
     }
