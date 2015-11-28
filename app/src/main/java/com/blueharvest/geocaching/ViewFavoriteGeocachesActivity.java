@@ -10,5 +10,6 @@ public class ViewFavoriteGeocachesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_favorite_geocaches);
         // todo: this feature is forthcoming
+        // todo: this may be obsolete and displayed on the ViewGeocachesActivity
     }
 }
