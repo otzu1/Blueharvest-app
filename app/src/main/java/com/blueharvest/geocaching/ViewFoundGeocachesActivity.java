@@ -10,5 +10,6 @@ public class ViewFoundGeocachesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_found_geocaches);
         // todo: this feature is forthcoming
+        // todo: this may be obsolete and displayed on the ViewGeocachesActivity
     }
 }
