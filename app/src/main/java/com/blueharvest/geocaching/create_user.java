@@ -312,7 +312,7 @@ public class create_user extends AppCompatActivity {
         else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            //showProgress(true);
+            showProgress(true); // jmb: uncommented out ... not sure why it was in the first place
             mCreateTask = new UserCreateTask();
             mCreateTask.execute((Void) null);
         }
