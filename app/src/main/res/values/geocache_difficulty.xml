@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="choose_difficulty">Choose Difficulty:</string>
     <string-array name="geocache_difficulty">
         <item>effortless</item>
         <item>mild</item>

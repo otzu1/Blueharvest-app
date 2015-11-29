@@ -108,7 +108,9 @@
                     android:layout_width="110dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.25"
-                    android:spinnerMode="dropdown"/>
+                    android:spinnerMode="dropdown"
+                    android:entries="@array/geocache_types"
+                    android:prompt="@string/choose_type"/>
 
             </LinearLayout>
 
@@ -122,19 +124,25 @@
                     android:id="@+id/size"
                     android:layout_width="115dp"
                     android:layout_height="50dp"
-                    android:spinnerMode="dropdown"/>
+                    android:spinnerMode="dropdown"
+                    android:entries="@array/geocache_sizes"
+                    android:prompt="@string/choose_size"/>
 
                 <Spinner
                     android:id="@+id/terrain"
                     android:layout_width="115dp"
                     android:layout_height="50dp"
-                    android:spinnerMode="dropdown"/>
+                    android:spinnerMode="dropdown"
+                    android:entries="@array/geocache_terrain"
+                    android:prompt="@string/choose_terrain"/>
 
                 <Spinner
                     android:id="@+id/difficulty"
                     android:layout_width="115dp"
                     android:layout_height="50dp"
-                    android:spinnerMode="dropdown"/>
+                    android:spinnerMode="dropdown"
+                    android:entries="@array/geocache_difficulty"
+                    android:prompt="@string/choose_difficulty"/>
             </LinearLayout>
 
             <Button

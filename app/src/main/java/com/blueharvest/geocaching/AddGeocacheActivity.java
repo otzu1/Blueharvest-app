@@ -86,40 +86,41 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         // type spinner
         // todo: hint for the spinner
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(this,
+        /*ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(this,
                 R.array.geocache_types, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        ((Spinner) findViewById(R.id.type)).setAdapter(typeAdapter);
+        ((Spinner) findViewById(R.id.type)).setAdapter(typeAdapter);*/
 
         // size spinner
         // todo: hint for the spinner
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> sizeAdapter = ArrayAdapter.createFromResource(this,
+        /*ArrayAdapter<CharSequence> sizeAdapter = ArrayAdapter.createFromResource(this,
                 R.array.geocache_sizes, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         sizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        ((Spinner) findViewById(R.id.size)).setAdapter(sizeAdapter);
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> terrainAdapter = ArrayAdapter.createFromResource(this,
-                R.array.geocache_terrain, android.R.layout.simple_spinner_item);
+        ((Spinner) findViewById(R.id.size)).setAdapter(sizeAdapter);*/
 
         // terrain spinner
         // todo: hint for the spinner
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        /*ArrayAdapter<CharSequence> terrainAdapter = ArrayAdapter.createFromResource(this,
+                R.array.geocache_terrain, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         terrainAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        ((Spinner) findViewById(R.id.terrain)).setAdapter(terrainAdapter);
+        ((Spinner) findViewById(R.id.terrain)).setAdapter(terrainAdapter);*/
+
         // difficulty spinner
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> difficultyAdapter = ArrayAdapter.createFromResource(this,
+        /*ArrayAdapter<CharSequence> difficultyAdapter = ArrayAdapter.createFromResource(this,
                 R.array.geocache_difficulty, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         difficultyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        ((Spinner) findViewById(R.id.difficulty)).setAdapter(difficultyAdapter);
+        ((Spinner) findViewById(R.id.difficulty)).setAdapter(difficultyAdapter);*/
 
         // validate user entries
         final EditText latitude = (EditText) findViewById(R.id.latitude);
