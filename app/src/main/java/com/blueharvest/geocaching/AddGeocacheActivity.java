@@ -13,9 +13,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -44,7 +42,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * a suggested random code (blueharvest-0.0.3+ required). Spinner controls are used for enumerating
  * values for size, terrain, and difficulty. The values for the enumerations are found hard-coded
  * in each respective .xml resource file in a string array and accessible through an adapter.
- * <p/>
+ * <p>
  * This activity then directs the user to the view geocache activity.
  *
  * @see <a href="http://developer.android.com/guide/topics/ui/controls/spinner.html">
@@ -54,7 +52,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class AddGeocacheActivity extends FragmentActivity implements LocationListener {
 
     // for logging
-    public static final String TAG = "blueharvest:: " + AddGeocacheActivity.class.getSimpleName();
+    private static final String TAG = "blueharvest:: " + AddGeocacheActivity.class.getSimpleName();
 
     // map
     private final static int MY_LOCATION_PERMISSION = 1;
@@ -67,6 +65,8 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
 
         // get user identifier from shared preferences
         // if we can't, disable the save button and notify the user
+        // alternatively, we could send the user to the error
+        // activity with a specific error
         if (getApplicationContext().getSharedPreferences(
                 "blueharvest", MODE_PRIVATE).getString("me", null) == null) {
             Toast.makeText(getApplicationContext(),
@@ -82,8 +82,12 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         ((EditText) findViewById(R.id.code)).setText(
                 blueharvest.geocaching.soap.objects.geocache.randomCode());
 
+        /*
+         * The following spinner code is no longer necessary
+         * here and since moved to xml resource files.
+         */
+
         // type spinner
-        // todo: hint for the spinner
         // Create an ArrayAdapter using the string array and a default spinner layout
         /*ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(this,
                 R.array.geocache_types, android.R.layout.simple_spinner_item);
@@ -93,7 +97,6 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         ((Spinner) findViewById(R.id.type)).setAdapter(typeAdapter);*/
 
         // size spinner
-        // todo: hint for the spinner
         // Create an ArrayAdapter using the string array and a default spinner layout
         /*ArrayAdapter<CharSequence> sizeAdapter = ArrayAdapter.createFromResource(this,
                 R.array.geocache_sizes, android.R.layout.simple_spinner_item);
@@ -103,7 +106,6 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         ((Spinner) findViewById(R.id.size)).setAdapter(sizeAdapter);*/
 
         // terrain spinner
-        // todo: hint for the spinner
         // Create an ArrayAdapter using the string array and a default spinner layout
         /*ArrayAdapter<CharSequence> terrainAdapter = ArrayAdapter.createFromResource(this,
                 R.array.geocache_terrain, android.R.layout.simple_spinner_item);
@@ -184,7 +186,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
                 // ^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,7}
                 if (!latitude.getText().toString().matches(
                         "^-?([1-8]?[1-9]|[1-9]0)\\.{1}\\d{1,7}"))
-                    latitude.setError("Latitude is not in decimal degrees.");
+                    latitude.setError("Please enter latitude in decimal degrees.");
             }
         });
 
@@ -205,7 +207,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
                 // ^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,7}
                 if (!longitude.getText().toString().matches(
                         "^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\\.{1}\\d{1,7}"))
-                    longitude.setError("Longitude must be in decimal degrees.");
+                    longitude.setError("Please enter longitude in decimal degrees.");
             }
         });
 
@@ -213,19 +215,17 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         name.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 name.setError(null);
                 if (name.getText().toString().isEmpty())
-                    name.setError("Name cannot be empty.");
+                    name.setError("Please enter a name.");
             }
         });
 
@@ -233,19 +233,17 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         description.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 description.setError(null);
                 if (description.getText().toString().isEmpty())
-                    description.setError("Description cannot be empty.");
+                    description.setError("Please enter a description.");
             }
         });
 
@@ -253,19 +251,17 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
         code.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 code.setError(null);
                 if (code.getText().toString().isEmpty()) {
-                    code.setError("Code cannot be empty.");
+                    code.setError("Please enter a code.");
                 }
             }
         });
@@ -277,24 +273,33 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
             public void onClick(View view) {
                 // validate
                 if (latitude.getError() != null) {
+                    latitude.setError("Please enter latitude in decimal degrees.");
                     latitude.requestFocus();
                     return;
                 }
                 if (longitude.getError() != null) {
+                    longitude.setError("Please enter latitude in decimal degrees.");
                     longitude.requestFocus();
                     return;
                 }
                 if (name.getError() != null || name.getText().toString().isEmpty()) {
+                    name.setError("Please enter a name.");
                     name.requestFocus();
                     return;
                 }
                 if (description.getError() != null || description.getText().toString().isEmpty()) {
+                    description.setError("Please enter a description");
                     description.requestFocus();
                     return;
                 }
                 if (code.getError() != null || description.getText().toString().isEmpty()) {
                     code.setText(blueharvest.geocaching.soap.objects.geocache.randomCode());
                     code.requestFocus();
+                    code.selectAll();
+                    // let the user confirm
+                    Toast.makeText(getApplicationContext(),
+                            "We chose a geocache code for you!",
+                            Toast.LENGTH_SHORT).show();
                     return;
                 }
                 // good to go!
@@ -309,8 +314,6 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
                 startActivity(intent);
             }
         });
-        /*Dialog dialog = GooglePlayServicesUtil.getErrorDialog(0, this, 0);
-        dialog.show();*/
     }
 
     /**
@@ -373,6 +376,8 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
             map.setMyLocationEnabled(true);
             // Enable the Zoom Controls of the Google Map
             map.getUiSettings().setZoomControlsEnabled(true);
+            // Enable the Toolbar of the Google Map
+            map.getUiSettings().setMapToolbarEnabled(true);
             // Getting LocationManager object from System Service LOCATION_SERVICE
             LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
             // Creating a criteria object to retrieve provider
@@ -396,14 +401,13 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
 
     /**
      * do this preferably once so that the user can edit the values without interference
+     *
      * @param latitude
      * @param longitude
      */
     private void handleLocation(double latitude, double longitude) {
         // clear the map
         map.clear();
-        // map type
-        map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         // Showing the current location in Google Map
         map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(latitude, longitude)));
         // Zoom in the Google Map
@@ -467,7 +471,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
 
     /**
      * Called when the location has changed.
-     * <p/>
+     * <p>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.
@@ -492,11 +496,11 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
      *                 provider is currently available.
      * @param extras   an optional Bundle which will contain provider specific
      *                 status variables.
-     *                 <p/>
+     *                 <p>
      *                 <p> A number of common key/value pairs for the extras Bundle are listed
      *                 below. Providers that use any of the keys on this list must
      *                 provide the corresponding value as described below.
-     *                 <p/>
+     *                 <p>
      *                 <ul>
      *                 <li> satellites - the number of satellites used to derive the fix
      */
@@ -536,7 +540,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
          * Override this method to perform a computation on a background thread. The
          * specified parameters are the parameters passed to {@link #execute}
          * by the caller of this task.
-         * <p/>
+         * <p>
          * This method can call {@link #publishProgress} to publish updates
          * on the UI thread.
          *
@@ -590,7 +594,7 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
          * Override this method to perform a computation on a background thread. The
          * specified parameters are the parameters passed to {@link #execute}
          * by the caller of this task.
-         * <p/>
+         * <p>
          * This method can call {@link #publishProgress} to publish updates
          * on the UI thread.
          *
