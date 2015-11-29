@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="choose_type">Choose Type:</string>
     <string-array name="geocache_types">
         <item>traditional</item>
         <item>virtual</item>
