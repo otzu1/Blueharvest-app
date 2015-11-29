@@ -19,7 +19,8 @@
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="11dp"
             android:layout_height="11dp"
-            android:id="@+id/create_user_progress" />
+            android:id="@+id/create_user_progress"
+            android:visibility="gone"/>
 
         <EditText
             android:layout_width="match_parent"
