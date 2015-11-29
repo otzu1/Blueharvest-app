@@ -1,7 +1,7 @@
 package com.blueharvest.geocaching;
 
 /**
- * Created by mrwittme on 11/26/15.
+ * Created by mrwittmer on 11/26/15.
  */
 import android.app.Activity;
 import android.content.Context;
