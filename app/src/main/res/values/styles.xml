@@ -3,6 +3,8 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
         <!-- Customize your theme here. -->
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">true</item>"
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -10,8 +12,9 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <!-- user home page(s) -->
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Light"/>
-
+    <!-- user home page(s) -->
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
 </resources>

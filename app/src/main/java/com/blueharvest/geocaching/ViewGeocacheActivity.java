@@ -68,8 +68,8 @@ public class ViewGeocacheActivity extends FragmentActivity {
 
         // get the geocache and set up the view in the onpostexecute function
         try {
-            //new GeocacheTask().execute(getIntent().getStringExtra("code"));
-            new GeocacheTask().execute("BH13GC7"); // todo: testing
+            new GeocacheTask().execute(getIntent().getStringExtra("code")
+                    == null ? "BH13GC7" :getIntent().getStringExtra("code"));
         } catch (Exception e) { // something went wrong, display a short message
             Toast.makeText(getApplicationContext(),
                     "Geocache could not be fetched. Please try again later!",
