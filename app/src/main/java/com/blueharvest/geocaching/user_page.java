@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -49,6 +50,20 @@ public class user_page extends AppCompatActivity implements LocationListener {
     //private EditText mLongitude;
     //private EditText mSearchRad;
     private final static int MY_LOCATION_PERMISSION = 1;
+
+    private int obp = 0;
+
+    public void onBackPressed() {
+        //Log.d(TAG, "onBackPressed");
+        obp++;
+        if (obp == 1) {
+            Toast.makeText(user_page.this, "Please press back again to exit.",
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            finish();
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

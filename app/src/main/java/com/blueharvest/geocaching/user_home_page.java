@@ -49,6 +49,12 @@ public class user_home_page extends AppCompatActivity implements LocationListene
     // for logging
     public static final String TAG = "blueharvest:: " + AddGeocacheActivity.class.getSimpleName();
 
+    public void onBackPressed() {
+        //Log.d(TAG, "onBackPressed");
+        startActivity(new Intent(user_home_page.this, user_page.class));
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

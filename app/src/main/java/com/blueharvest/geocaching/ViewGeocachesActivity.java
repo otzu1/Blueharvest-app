@@ -17,6 +17,7 @@ import java.util.List;
 
 /**
  * This activity displays a list of Geocaches.
+ * todo: handle no results
  * todo: incorporate more details for each item
  * todo: this activity is only an entry for list by location
  * and should also be flexible to handle other lists as well
@@ -32,6 +33,11 @@ public class ViewGeocachesActivity extends AppCompatActivity {
     List<RowItem> rowItems;
 
     private SearchTask mSearchTask = null;
+
+    public void onBackPressed() {
+        //Log.d(TAG, "onBackPressed");
+        startActivity(new Intent(ViewGeocachesActivity.this, user_page.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
