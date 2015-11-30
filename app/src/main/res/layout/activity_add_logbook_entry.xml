@@ -21,13 +21,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:hint="@string/add_logbook_entry_title"/>
+            android:capitalize="words"
+            android:hint="@string/add_logbook_entry_title"
+            android:inputType="textCapWords"/>
 
         <EditText
             android:id="@+id/text"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_gravity="center_horizontal"
+            android:capitalize="sentences"
             android:elegantTextHeight="false"
             android:ems="10"
             android:gravity="top"
