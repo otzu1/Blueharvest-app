@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     /**
      * Called when the location has changed.
-     * <p>
+     * <p/>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.
@@ -294,11 +294,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
      *                 provider is currently available.
      * @param extras   an optional Bundle which will contain provider specific
      *                 status variables.
-     *                 <p>
+     *                 <p/>
      *                 <p> A number of common key/value pairs for the extras Bundle are listed
      *                 below. Providers that use any of the keys on this list must
      *                 provide the corresponding value as described below.
-     *                 <p>
+     *                 <p/>
      *                 <ul>
      *                 <li> satellites - the number of satellites used to derive the fix
      */

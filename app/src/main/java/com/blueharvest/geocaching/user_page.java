@@ -1,5 +1,6 @@
 package com.blueharvest.geocaching;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,6 +13,8 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -29,9 +32,7 @@ import com.google.android.gms.maps.model.LatLng;
  * location, entry for latitude and longitude, search based on latitude, longitude, and
  * radius later displayed in either a map view or a list view of the results. Additionally,
  * this activity offers the ability to add a geocache, go to help or settings, and to log out.
- *
- * todo: validate latitude range (regex works well for this)
- * todo: validate longitude range (regex works well for this)
+ * <p/>
  * todo: validate radius range (regex could do the trick)
  * todo: marker for latitude and longitude entry (idea)
  * todo: move map after latitude and longitude entry (idea)
@@ -44,9 +45,9 @@ public class user_page extends AppCompatActivity implements LocationListener {
     public static final String TAG = "blueharvest:: " + AddGeocacheActivity.class.getSimpleName();
 
     private GoogleMap mMap;
-    private EditText mLatitude;
-    private EditText mLongitude;
-    private EditText mSearchRad;
+    //private EditText mLatitude;
+    //private EditText mLongitude;
+    //private EditText mSearchRad;
     private final static int MY_LOCATION_PERMISSION = 1;
 
     @Override
@@ -55,17 +56,98 @@ public class user_page extends AppCompatActivity implements LocationListener {
         setContentView(R.layout.activity_user_page);
         //Log.d(TAG, "user_page.java");
 
-        mLatitude = (EditText) findViewById(R.id.latitude);
-        mLongitude = (EditText) findViewById(R.id.longitude);
-        mSearchRad = (EditText) findViewById(R.id.searchRad);
+        //mLatitude = (EditText) findViewById(R.id.latitude);
+        //mLongitude = (EditText) findViewById(R.id.longitude);
+        //mSearchRad = (EditText) findViewById(R.id.searchRad);
 
         View mMapView = findViewById(R.id.mapParent);
+
+        // validate user entries
+        final EditText latitude = (EditText) findViewById(R.id.latitude);
+        latitude.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                latitude.setError(null);
+                if (latitude.getText().toString().isEmpty()
+                        || Double.parseDouble(latitude.getText().toString()) < -90
+                        || Double.parseDouble(latitude.getText().toString()) > 90)
+                    latitude.setError("Please enter latitude in decimal degrees.");
+            }
+        });
+
+        final EditText longitude = (EditText) findViewById(R.id.longitude);
+        longitude.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                longitude.setError(null);
+                if (longitude.getText().toString().isEmpty()
+                        || Double.parseDouble(longitude.getText().toString()) < -180
+                        || Double.parseDouble(longitude.getText().toString()) > 180)
+                    longitude.setError("Please enter longitude in decimal degrees.");
+            }
+        });
+
+        final EditText radius = (EditText) findViewById(R.id.searchRad);
+        radius.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                radius.setError(null);
+                if (radius.getText().toString().isEmpty()
+                        || Double.parseDouble(radius.getText().toString()) < 0 // negative values
+                        || 6371 < Double.parseDouble(radius.getText().toString())) { // > earth's radius
+                    radius.setError("Please enter a valid radius between 0 and 6371.");
+                }
+
+            }
+        });
 
         Button mSearch = (Button) findViewById(R.id.buttonSearch);
         mSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //Log.d(TAG, "search button clicked");
+                // validate user input
+                if (latitude.getError() != null || latitude.getText().toString().isEmpty()) {
+                    latitude.setError("Please enter latitude in decimal degrees.");
+                    latitude.requestFocus();
+                    return;
+                }
+                if (longitude.getError() != null || longitude.getText().toString().isEmpty()) {
+                    longitude.setError("Please enter latitude in decimal degrees.");
+                    longitude.requestFocus();
+                    return;
+                }
+                if (radius.getError() != null || radius.getText().toString().isEmpty()) {
+                    radius.setError("Please enter a valid radius between 0 and 6371.");
+                    radius.requestFocus();
+                    return;
+                }
                 searchGeocache();
             }
         });
@@ -84,6 +166,22 @@ public class user_page extends AppCompatActivity implements LocationListener {
             @Override
             public void onClick(View view) {
                 //Log.d(TAG, "search list button clicked");
+                // validate user input
+                if (latitude.getError() != null) {
+                    latitude.setError("Please enter latitude in decimal degrees.");
+                    latitude.requestFocus();
+                    return;
+                }
+                if (longitude.getError() != null) {
+                    longitude.setError("Please enter latitude in decimal degrees.");
+                    longitude.requestFocus();
+                    return;
+                }
+                if (radius.getError() != null || radius.getText().toString().isEmpty()) {
+                    radius.setError("Please enter a valid radius between 0 and 6371.");
+                    radius.requestFocus();
+                    return;
+                }
                 listSearchGeocache();
             }
         });
@@ -114,9 +212,9 @@ public class user_page extends AppCompatActivity implements LocationListener {
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-
                     Snackbar.make(mMapView, "Location access is required to show your current position.",
                             Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
+                        @TargetApi(Build.VERSION_CODES.M)
                         @Override
                         public void onClick(View view) {
                             // Request the permission
@@ -182,9 +280,9 @@ public class user_page extends AppCompatActivity implements LocationListener {
     protected void listSearchGeocache() {
         //Log.d(TAG, "listSearchGeocache called");
         Intent listSearchIntent = new Intent(user_page.this, ViewGeocachesActivity.class);
-        Double searchRad = Double.parseDouble(mSearchRad.getText().toString());
-        Double searchLat = Double.parseDouble(mLatitude.getText().toString());
-        Double searchLong = Double.parseDouble(mLongitude.getText().toString());
+        Double searchRad = Double.parseDouble(((EditText) findViewById(R.id.searchRad)).getText().toString());
+        Double searchLat = Double.parseDouble(((EditText) findViewById(R.id.latitude)).getText().toString());
+        Double searchLong = Double.parseDouble(((EditText) findViewById(R.id.longitude)).getText().toString());
         listSearchIntent.putExtra("SearchRad", searchRad);
         listSearchIntent.putExtra("SearchLat", searchLat);
         listSearchIntent.putExtra("SearchLong", searchLong);
@@ -195,9 +293,9 @@ public class user_page extends AppCompatActivity implements LocationListener {
     protected void searchGeocache() {
         //Log.d(TAG, "searchGeocache called");
         Intent searchIntent = new Intent(user_page.this, user_home_page.class);
-        Double searchRad = Double.parseDouble(mSearchRad.getText().toString());
-        Double searchLat = Double.parseDouble(mLatitude.getText().toString());
-        Double searchLong = Double.parseDouble(mLongitude.getText().toString());
+        Double searchRad = Double.parseDouble(((EditText) findViewById(R.id.searchRad)).getText().toString());
+        Double searchLat = Double.parseDouble(((EditText) findViewById(R.id.latitude)).getText().toString());
+        Double searchLong = Double.parseDouble(((EditText) findViewById(R.id.longitude)).getText().toString());
         searchIntent.putExtra("SearchRad", searchRad);
         searchIntent.putExtra("SearchLat", searchLat);
         searchIntent.putExtra("SearchLong", searchLong);

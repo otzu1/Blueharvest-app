@@ -17,7 +17,7 @@
         <RelativeLayout
             android:id="@+id/mapParent"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="0dp"
             android:layout_weight="0.56">
 
             <fragment
@@ -45,6 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight=".49"
                 android:hint="@string/user_page_latitude"
+                android:inputType="numberSigned|numberDecimal"
                 android:numeric="signed|decimal"/>
 
             <EditText
@@ -53,6 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight=".49"
                 android:hint="@string/user_page_longitude"
+                android:inputType="numberSigned|numberDecimal"
                 android:numeric="signed|decimal"/>
         </LinearLayout>
 
@@ -84,22 +86,22 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="@string/user_page_radius_hint"
-                android:inputType="number"/>
+                android:inputType="number|numberDecimal"/>
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:baselineAligned="false"
             android:gravity="center_horizontal"
-            android:baselineAligned="false">
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="150dp"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_weight=".49">
+                android:layout_weight=".49"
+                android:orientation="vertical">
 
                 <Button
                     android:id="@+id/buttonSearch"
@@ -123,8 +125,8 @@
             <LinearLayout
                 android:layout_width="150dp"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_weight=".49">
+                android:layout_weight=".49"
+                android:orientation="vertical">
 
                 <Button
                     android:id="@+id/buttonListSearch"

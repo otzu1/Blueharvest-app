@@ -64,7 +64,7 @@
     <string name="view_geocache_favorite_label">Favorite</string>
     <string name="error_the_scream">The Scream</string>
     <string name="error_image_content_description">Oops! We seem to have a problem!</string>
-    <string name="error_message">May the Force be with you.</string>
+    <string name="error_message">Oops! We seem to have a problem!.</string>
     <string name="user_page_title">Geocache Search</string>
     <string name="user_page_for_radius">Radius</string>
     <string name="user_page_radius_hint">(in km)</string>
