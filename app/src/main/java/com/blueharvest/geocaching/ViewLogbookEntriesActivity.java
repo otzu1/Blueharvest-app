@@ -2,6 +2,7 @@ package com.blueharvest.geocaching;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,16 @@ public class ViewLogbookEntriesActivity extends AppCompatActivity {
 
     // for logging
     public static final String TAG = "blueharvest:: " + AddGeocacheActivity.class.getSimpleName();
+
+    @Override
+    public void onBackPressed() {
+        Log.d(TAG, "onBackPressed");
+        Intent intent = new Intent(ViewLogbookEntriesActivity.this, ViewGeocacheActivity.class);
+        //intent.putExtra("logbookid", getIntent().getStringExtra("logbookid"));
+        //intent.putExtra("geocacheid", getIntent().getStringExtra("geocacheid"));
+        //intent.putExtra("code", getIntent().getStringExtra("code"));
+        startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
