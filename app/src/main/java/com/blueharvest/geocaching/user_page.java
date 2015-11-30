@@ -79,8 +79,9 @@ public class user_page extends AppCompatActivity implements LocationListener {
             public void afterTextChanged(Editable s) {
                 latitude.setError(null);
                 if (latitude.getText().toString().isEmpty()
-                        || Double.parseDouble(latitude.getText().toString()) < -90
-                        || Double.parseDouble(latitude.getText().toString()) > 90)
+                        || (latitude.getText().toString().length() > 1
+                        && (Double.parseDouble(latitude.getText().toString()) < -90
+                        || Double.parseDouble(latitude.getText().toString()) > 90)))
                     latitude.setError("Please enter latitude in decimal degrees.");
             }
         });
@@ -99,8 +100,9 @@ public class user_page extends AppCompatActivity implements LocationListener {
             public void afterTextChanged(Editable s) {
                 longitude.setError(null);
                 if (longitude.getText().toString().isEmpty()
-                        || Double.parseDouble(longitude.getText().toString()) < -180
-                        || Double.parseDouble(longitude.getText().toString()) > 180)
+                        || (longitude.getText().toString().length() > 1
+                        && (Double.parseDouble(longitude.getText().toString()) > 180
+                        || Double.parseDouble(longitude.getText().toString()) < -180)))
                     longitude.setError("Please enter longitude in decimal degrees.");
             }
         });
