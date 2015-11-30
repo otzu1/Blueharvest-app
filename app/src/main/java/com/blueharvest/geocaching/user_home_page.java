@@ -1,5 +1,6 @@
 package com.blueharvest.geocaching;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -23,12 +24,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * This activity displays geocaches on a map.
- * todo: fixme ... the map defaults to current location rather than the center point
+ * todo: fixme ... the map defaults to current location or 0,0 rather than the center point
  * todo: fixme ... conflict between current location and search result location
  * todo: this can be duplicated two ways:
  * 1. the user's current location is null (onLocationChanged will never be called)
@@ -45,25 +46,19 @@ public class user_home_page extends AppCompatActivity implements LocationListene
 
     private SearchTask mSearchTask = null;
 
-    private static final String logCat = "user home page";
     // for logging
     public static final String TAG = "blueharvest:: " + AddGeocacheActivity.class.getSimpleName();
-    blueharvest.geocaching.soap.objects.geocache.geocaches results;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home_page);
 
-        Log.d("blueharvest", "user_home_page.java");
+        Log.d(TAG, "user_home_page.java");
 
-        // todo: fixme, this is broken
-        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);*/
-
-        searchRadius = getIntent().getDoubleExtra("SearchRad", 0.00);
-        searchLat = getIntent().getDoubleExtra("SearchLat", 0.00);
-        searchLon = getIntent().getDoubleExtra("SearchLong", 0.00);
+        searchRadius = getIntent().getDoubleExtra("SearchRad", 10);
+        searchLat = getIntent().getDoubleExtra("SearchLat", 40.7981884);
+        searchLon = getIntent().getDoubleExtra("SearchLong", -77.8599151);
 
         String a = "Latitude ";
         String b = "Longitude ";
@@ -87,6 +82,7 @@ public class user_home_page extends AppCompatActivity implements LocationListene
 
                     Snackbar.make(mMapView, "Location access is required to show your current position.",
                             Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
+                        @TargetApi(Build.VERSION_CODES.M)
                         @Override
                         public void onClick(View view) {
                             // Request the permission
@@ -131,7 +127,7 @@ public class user_home_page extends AppCompatActivity implements LocationListene
     public void startSearchTask(Double lat, Double lon) {
 
         if (mSearchTask == null) {
-            Location searchCenter = new Location ("Newer");
+            Location searchCenter = new Location("Newer");
             searchCenter.setLatitude(lat);
             searchCenter.setLongitude(lon);
             mSearchTask = new SearchTask();
@@ -161,7 +157,7 @@ public class user_home_page extends AppCompatActivity implements LocationListene
     }
 
     public void setupMap() {
-        Log.d(logCat, "setupMap");
+        Log.d(TAG, "setupMap()");
         // Getting Google Play availability status
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
 
@@ -213,9 +209,9 @@ public class user_home_page extends AppCompatActivity implements LocationListene
             if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
                 // Getting Current Location
                 Location location = locationManager.getLastKnownLocation(provider);
-
                 if (location != null) {
                     onLocationChanged(location);
+                } else { // todo: handle no current location
                 }
                 locationManager.requestLocationUpdates(provider, 20000, 0, this);
             }
@@ -244,17 +240,14 @@ public class user_home_page extends AppCompatActivity implements LocationListene
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-
     }
 
     /**
@@ -266,13 +259,8 @@ public class user_home_page extends AppCompatActivity implements LocationListene
         // jmb: added private object for onpostexecute 2015-11-24
         private blueharvest.geocaching.soap.objects.geocache.geocaches gs;
 
-        /*public SearchTask(Location center) {
-
-        }*/
-
         @Override
         protected Void doInBackground(Location... locations) {
-
             for (int i = 0; i < locations.length; i++) { // should only be one
                 double myLatitude = locations[i].getLatitude();
                 double myLongitude = locations[i].getLongitude();
@@ -286,23 +274,18 @@ public class user_home_page extends AppCompatActivity implements LocationListene
         @Override
         protected void onPostExecute(Void result) {
             // Generate the markers on the map
-            if (gs != null) {
-
-                for(blueharvest.geocaching.soap.objects.geocache geocache : gs)
+            if (gs != null && gs.size() > 0) { // jmb: added size check, too
+                for (blueharvest.geocaching.soap.objects.geocache geocache : gs)
                     mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(geocache.getLocation().getLatitude().getDecimalDegrees(),
-                                geocache.getLocation().getLongitude().getDecimalDegrees()))
-                        .title(geocache.getName())
-                        .snippet(geocache.getCode()));
-
-                Log.d("user home page", "Geocache found");
-
+                            .position(new LatLng(geocache.getLocation().getLatitude().getDecimalDegrees(),
+                                    geocache.getLocation().getLongitude().getDecimalDegrees()))
+                            .title(geocache.getName())
+                            .snippet(geocache.getCode()));
+                Log.d(TAG, "geocache(s) found");
             } else {
-
-                Log.d("user home page", "Geocache not found");
-
+                // todo: toast or dialog to let user know
+                Log.d(TAG, "geocache(s) not found");
             }
-
             mSearchTask = null;
         }
 
@@ -310,8 +293,8 @@ public class user_home_page extends AppCompatActivity implements LocationListene
         protected void onCancelled() {
             mSearchTask = null;
         }
-    }
 
+    }
 
 }
 
