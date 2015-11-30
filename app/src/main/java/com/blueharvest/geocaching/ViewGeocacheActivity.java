@@ -69,7 +69,7 @@ public class ViewGeocacheActivity extends FragmentActivity {
         // get the geocache and set up the view in the onpostexecute function
         try {
             new GeocacheTask().execute(getIntent().getStringExtra("code")
-                    == null ? "BH13GC7" :getIntent().getStringExtra("code"));
+                    == null ? "BH13GC7" : getIntent().getStringExtra("code"));
         } catch (Exception e) { // something went wrong, display a short message
             Toast.makeText(getApplicationContext(),
                     "Geocache could not be fetched. Please try again later!",
@@ -114,6 +114,20 @@ public class ViewGeocacheActivity extends FragmentActivity {
                 startActivity(intent);
             }
         });
+
+        // view button with click listener
+        Button view = (Button) findViewById(R.id.view);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ViewGeocacheActivity.this, ViewLogbookEntriesActivity.class);
+                intent.putExtra("logbookid", ((TextView) findViewById(R.id.logbookid)).getText().toString());
+                intent.putExtra("geocacheid", ((TextView) findViewById(R.id.geocacheid)).getText().toString());
+                intent.putExtra("code", ((TextView) findViewById(R.id.code)).getText().toString());
+                startActivity(intent);
+            }
+        });
+
     }
 
     @Override
