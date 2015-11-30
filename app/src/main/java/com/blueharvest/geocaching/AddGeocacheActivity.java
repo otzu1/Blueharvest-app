@@ -58,6 +58,11 @@ public class AddGeocacheActivity extends FragmentActivity implements LocationLis
     private final static int MY_LOCATION_PERMISSION = 1;
     private GoogleMap map;
 
+    public void onBackPressed() {
+        //Log.d(TAG, "onBackPressed");
+        startActivity(new Intent(AddGeocacheActivity.this, user_page.class));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
