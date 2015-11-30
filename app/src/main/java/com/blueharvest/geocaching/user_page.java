@@ -33,9 +33,9 @@ import com.google.android.gms.maps.model.LatLng;
  * radius later displayed in either a map view or a list view of the results. Additionally,
  * this activity offers the ability to add a geocache, go to help or settings, and to log out.
  * <p/>
- * todo: validate radius range (regex could do the trick)
  * todo: marker for latitude and longitude entry (idea)
  * todo: move map after latitude and longitude entry (idea)
+ * todo: consider a draggable marker for latitude and longitude (like add geocache activity)
  * todo: validation before any search button (map or list)
  * todo: logout button
  */

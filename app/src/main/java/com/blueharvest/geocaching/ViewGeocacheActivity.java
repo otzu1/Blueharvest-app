@@ -42,7 +42,6 @@ import blueharvest.geocaching.concepts.location;
  * geocache information.
  * <p/>
  * todo: send intent message to a log activity
- * todo: send intent to view all logs of this geocache
  * todo: get current location to display the distance to the geocache (requires LocationListener)
  *
  * @since 2015-11-22
@@ -278,11 +277,14 @@ public class ViewGeocacheActivity extends FragmentActivity {
                 ((TextView) findViewById(R.id.geocacheid)).setText(g.getId().toString());
                 ((TextView) findViewById(R.id.logbookid)).setText(g.getLogbook().getId().toString());
             } else { // something went wrong, display a short message and disable/hide log button
+                // todo: consider directing the user to an error page
                 Toast.makeText(getApplicationContext(),
                         "Geocache could not be fetched. Please try again later.",
                         Toast.LENGTH_SHORT).show();
                 findViewById(R.id.log).setEnabled(false);
                 findViewById(R.id.log).setVisibility(View.INVISIBLE);
+                findViewById(R.id.view).setEnabled(false);
+                findViewById(R.id.view).setVisibility(View.INVISIBLE);
             }
         }
 
