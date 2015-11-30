@@ -270,12 +270,27 @@
         </LinearLayout>
     </ScrollView>
 
-    <Button
-        android:id="@+id/log"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentStart="false"
         android:layout_alignParentBottom="true"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/view_geocache_log"/>
+        android:gravity="center_horizontal">
+
+        <Button
+            android:id="@+id/log"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/view_geocache_log"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Logs"
+            android:id="@+id/view"/>
+    </LinearLayout>
 
 </RelativeLayout>

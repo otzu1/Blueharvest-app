@@ -26,7 +26,7 @@ public class ViewLogbookEntriesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_logbook_entries);
         new LogbookEntriesTask().execute(
-                java.util.UUID.fromString("4D08BE88-655F-4D6D-A79A-E20565C4C40A"));
+                java.util.UUID.fromString(getIntent().getStringExtra("logbookid")));
     }
 
     /**
