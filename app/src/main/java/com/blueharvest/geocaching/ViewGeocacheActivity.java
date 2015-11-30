@@ -41,7 +41,6 @@ import blueharvest.geocaching.concepts.location;
  * The layout above the log button scrolls with room to spare at the bottom to avoid blocking the
  * geocache information.
  * <p/>
- * todo: send intent message to a log activity
  * todo: get current location to display the distance to the geocache (requires LocationListener)
  *
  * @since 2015-11-22
@@ -56,6 +55,12 @@ public class ViewGeocacheActivity extends FragmentActivity {
     private final static int MY_LOCATION_PERMISSION = 1;
     private final static double distance = 10; // km
     private blueharvest.geocaching.soap.objects.geocache.geocaches geocaches;
+
+    @Override
+    public void onBackPressed() {
+        //Log.d(TAG, "onBackPressed");
+        startActivity(new Intent(ViewGeocacheActivity.this, user_home_page.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
