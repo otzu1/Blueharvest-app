@@ -20,6 +20,11 @@ public class AddLogbookEntryActivity extends AppCompatActivity {
 
     private java.util.UUID id;
 
+    public void onBackPressed() {
+        //Log.d(TAG, "onBackPressed");
+        startActivity(new Intent(AddLogbookEntryActivity.this, ViewGeocacheActivity.class));
+    }
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_logbook_entry);

@@ -8,11 +8,15 @@ import android.os.Bundle;
 public class LogoutActivity extends AppCompatActivity {
 
     @Override
+    public void onBackPressed() {
+        //Log.d(TAG, "onBackPressed");
+        startActivity(new Intent(LogoutActivity.this, user_page.class));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logout);
-
-        // todo: clear the back stack
 
         Thread timerThread = new Thread() {
             public void run() {
