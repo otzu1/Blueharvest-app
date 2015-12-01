@@ -35,6 +35,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * todo: this can be duplicated two ways:
  * 1. the user's current location is null (onLocationChanged will never be called)
  * 2. the user's current location changes (onLocationChanged called again)
+ * todo: consider a dialog for showing more information on a geocache here
+ * todo: the user could then click on it to see more and not be surprised
  */
 public class user_home_page extends AppCompatActivity implements LocationListener {
 
@@ -55,7 +57,6 @@ public class user_home_page extends AppCompatActivity implements LocationListene
         startActivity(new Intent(user_home_page.this, user_page.class));
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +64,7 @@ public class user_home_page extends AppCompatActivity implements LocationListene
 
         Log.d(TAG, "onCreate");
 
+        // defaults to 10 km around Penn State
         searchRadius = getIntent().getDoubleExtra("SearchRad", 10);
         searchLat = getIntent().getDoubleExtra("SearchLat", 40.7981884);
         searchLon = getIntent().getDoubleExtra("SearchLong", -77.8599151);
@@ -118,6 +120,7 @@ public class user_home_page extends AppCompatActivity implements LocationListene
                     curZoom = cameraPosition.zoom;
                     // jmb 2015-12-01: changed the search task for when the camera moves
                     startSearchTask(cameraPosition.target.latitude, cameraPosition.target.longitude);
+                    // todo: the radius is still the same as the search
                     //startSearchTask(searchLat, searchLon);
                 }
 
@@ -129,6 +132,7 @@ public class user_home_page extends AppCompatActivity implements LocationListene
                 .position(new LatLng(searchLat, searchLon))
                 .title("Search Center")
                 .snippet("Center of Search")
+                // jmb 2015-12-01: make this marker different than the geocache markers
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         mMap.addMarker(currentMarker);
 
@@ -150,16 +154,12 @@ public class user_home_page extends AppCompatActivity implements LocationListene
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-
             case MY_LOCATION_PERMISSION: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     setupMap();
-
                 } else {
-
-
+                    // todo: handle this situation
                 }
             }
         }
@@ -273,8 +273,9 @@ public class user_home_page extends AppCompatActivity implements LocationListene
     }
 
     /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
+     * Represents an asynchronous geocache search task used to locate geocaches
+     * on the map.
+     * todo: change functionality to also get a new value for radius rather than using the search radius only
      */
     public class SearchTask extends AsyncTask<Location, Void, Void> {
 
