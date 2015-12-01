@@ -22,6 +22,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -60,7 +61,7 @@ public class user_home_page extends AppCompatActivity implements LocationListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home_page);
 
-        Log.d(TAG, "user_home_page.java");
+        Log.d(TAG, "onCreate");
 
         searchRadius = getIntent().getDoubleExtra("SearchRad", 10);
         searchLat = getIntent().getDoubleExtra("SearchLat", 40.7981884);
@@ -125,7 +126,8 @@ public class user_home_page extends AppCompatActivity implements LocationListene
         currentMarker = new MarkerOptions()
                 .position(new LatLng(searchLat, searchLon))
                 .title("Search Center")
-                .snippet("Center of Search");
+                .snippet("Center of Search")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         mMap.addMarker(currentMarker);
 
     }
@@ -162,8 +164,10 @@ public class user_home_page extends AppCompatActivity implements LocationListene
 
     }
 
+    // todo: current location is not necessary in this activity
+    // todo: refactor for location based on search data
     public void setupMap() {
-        Log.d(TAG, "setupMap()");
+        Log.d(TAG, "setupMap");
         // Getting Google Play availability status
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
 
@@ -185,11 +189,14 @@ public class user_home_page extends AppCompatActivity implements LocationListene
             // Enabling MyLocation Layer of Google Map
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setZoomControlsEnabled(true);
+
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 
                 @Override
                 public boolean onMarkerClick(Marker marker) {
-                    if (!marker.equals(currentMarker)) {
+                    // jmb: added snippet check, too ... the "current" marker was still clickable
+                    // and resulted in error in viewgeocache activity
+                    if (!marker.equals(currentMarker) || !marker.getSnippet().equals("Center of Search")) {
 
                         Intent cacheIntent = new Intent(user_home_page.this, ViewGeocacheActivity.class);
                         cacheIntent.putExtra("code", marker.getSnippet());
@@ -214,18 +221,25 @@ public class user_home_page extends AppCompatActivity implements LocationListene
 
             if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
                 // Getting Current Location
-                Location location = locationManager.getLastKnownLocation(provider);
+                // jmb: commented this out, we want location of the search, not current location
+                //Location location = locationManager.getLastKnownLocation(provider);
+                Location location = new Location("");
+                location.setLatitude(searchLat);
+                location.setLongitude(searchLon);
                 if (location != null) {
                     onLocationChanged(location);
-                } else { // todo: handle no current location
+                } else { // todo: handle no location
+
                 }
-                locationManager.requestLocationUpdates(provider, 20000, 0, this);
+                // jmb: changed this to 10 minutes ... that should be plenty
+                locationManager.requestLocationUpdates(provider, 600000, 0, this);
             }
         }
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d(TAG, "onLocationChanged");
 
         // Getting latitude of the current location
         double latitude = location.getLatitude();
