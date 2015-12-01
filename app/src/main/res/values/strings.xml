@@ -77,4 +77,9 @@
     <string name="user_page_latitude">latitude</string>
     <string name="user_page_longitude">longitude</string>
     <string name="listview_logbook_entry_image_desc">author image</string>
+    <string name="distance_label">Distance Units</string>
+    <string name="settings_km">km</string>
+    <string name="settings_mi">mi</string>
+    <string name="settings_notifications_label">Notifications</string>
+    <string name="settings_login_label">Auto Login</string>
 </resources>
