@@ -283,6 +283,8 @@ public class ViewGeocacheActivity extends FragmentActivity {
                 ((TextView) findViewById(R.id.logbookid)).setText(g.getLogbook().getId().toString());
             } else { // something went wrong, display a short message and disable/hide log button
                 // todo: consider directing the user to an error page
+                startActivity(new Intent(ViewGeocacheActivity.this, ErrorActivity.class));
+
                 Toast.makeText(getApplicationContext(),
                         "Geocache could not be fetched. Please try again later.",
                         Toast.LENGTH_SHORT).show();
