@@ -8,20 +8,23 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:theme="@style/Theme.AppCompat.NoActionBar"
                 tools:context="com.blueharvest.geocaching.user_home_page">
+
+    <!--//app:layout_behavior="@string/appbar_scrolling_view_behavior"//-->
 
     <TextView
         android:id="@+id/tv_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <fragment android:id="@+id/map"
-              class="com.google.android.gms.maps.SupportMapFragment"
-              xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_below="@id/tv_location"/>
+    <fragment
+        android:id="@+id/map"
+        class="com.google.android.gms.maps.SupportMapFragment"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/tv_location"/>
 
     <LinearLayout
         android:id="@+id/user_home_content_form"
@@ -30,5 +33,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:orientation="vertical"/>
+        android:orientation="vertical"
+        android:theme="@style/Theme.AppCompat.Light"/>
 </RelativeLayout>

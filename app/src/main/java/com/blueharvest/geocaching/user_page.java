@@ -288,8 +288,15 @@ public class user_page extends AppCompatActivity implements LocationListener {
 
                 if (location != null) {
                     onLocationChanged(location);
+                } else { // jmb: introduce a mock location
+                    Location l = new Location("");
+                    // Penn State
+                    l.setLatitude(40.7981884);
+                    l.setLongitude(-77.8599151);
+                    onLocationChanged(l); // reuse onLocationChanged for now ...
                 }
-                locationManager.requestLocationUpdates(provider, 20000, 0, this);
+                // 10 minutes should be more than enough ... if not, change this
+                locationManager.requestLocationUpdates(provider, 600000, 0, this);
             }
         }
     }
