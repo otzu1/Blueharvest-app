@@ -113,10 +113,12 @@ public class user_home_page extends AppCompatActivity implements LocationListene
 
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
+                Log.d(TAG, "onCameraChange");
                 if (cameraPosition.zoom != curZoom) {
                     curZoom = cameraPosition.zoom;
-
-                    startSearchTask(searchLat, searchLon);
+                    // jmb 2015-12-01: changed the search task for when the camera moves
+                    startSearchTask(cameraPosition.target.latitude, cameraPosition.target.longitude);
+                    //startSearchTask(searchLat, searchLon);
                 }
 
             }

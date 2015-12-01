@@ -25,7 +25,11 @@ public class ViewLogbookEntriesActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         //Log.d(TAG, "onBackPressed");
-        startActivity(new Intent(ViewLogbookEntriesActivity.this, ViewGeocacheActivity.class));
+        Intent intent = new Intent(ViewLogbookEntriesActivity.this, AddLogbookEntryActivity.class);
+        //intent.putExtra("logbookid", ((TextView) findViewById(R.id.logbookid)).getText().toString());
+        //intent.putExtra("geocacheid", ((TextView) findViewById(R.id.geocacheid)).getText().toString());
+        intent.putExtra("code", ((TextView) findViewById(R.id.code)).getText().toString());
+        startActivity(intent);
     }
 
     @Override
