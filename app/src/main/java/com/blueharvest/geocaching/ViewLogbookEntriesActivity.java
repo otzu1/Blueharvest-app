@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.DialogInterface;
 
 import java.util.ArrayList;
 
@@ -25,10 +26,8 @@ public class ViewLogbookEntriesActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         //Log.d(TAG, "onBackPressed");
-        Intent intent = new Intent(ViewLogbookEntriesActivity.this, AddLogbookEntryActivity.class);
-        //intent.putExtra("logbookid", ((TextView) findViewById(R.id.logbookid)).getText().toString());
-        //intent.putExtra("geocacheid", ((TextView) findViewById(R.id.geocacheid)).getText().toString());
-        intent.putExtra("code", ((TextView) findViewById(R.id.code)).getText().toString());
+        Intent intent = new Intent(ViewLogbookEntriesActivity.this, ViewGeocacheActivity.class);
+        intent.putExtra("code", getIntent().getStringExtra("code")); // send it back
         startActivity(intent);
     }
 
@@ -74,12 +73,34 @@ public class ViewLogbookEntriesActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean result) {
             if (result && l != null && l.getEntries() != null) {
-                // Create the adapter to convert the array to views
-                LogbookEntriesAdapter a = new LogbookEntriesAdapter(
-                        ViewLogbookEntriesActivity.this, l.getEntries());
-                // Attach the adapter to a ListView
-                ((ListView) findViewById(R.id.logbookentries)).setAdapter(a);
-                //for (blueharvest.geocaching.concepts.logbook.entry e : l.getEntries())
+                if (l.getEntries().size() > 0) {
+                    // Create the adapter to convert the array to views
+                    LogbookEntriesAdapter a = new LogbookEntriesAdapter(
+                            ViewLogbookEntriesActivity.this, l.getEntries());
+                    // Attach the adapter to a ListView
+                    ((ListView) findViewById(R.id.logbookentries)).setAdapter(a);
+                } else if (l.getEntries().size() == 0) { // none to show, let the user decide what to do
+                    new AlertDialog.Builder(ViewLogbookEntriesActivity.this)
+                            .setTitle("No Logbook Entries")
+                            .setMessage("Would you like to add a logbook entry?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent(ViewLogbookEntriesActivity.this, AddLogbookEntryActivity.class);
+                                    intent.putExtra("logbookid", getIntent().getStringExtra("logbookid")); // pass it on
+                                    intent.putExtra("code", getIntent().getStringExtra("code")); // pass it on
+                                    startActivity(intent);
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent(ViewLogbookEntriesActivity.this, ViewGeocacheActivity.class);
+                                    intent.putExtra("code", getIntent().getStringExtra("code")); // send it back
+                                    startActivity(intent);
+                                }
+                            }).show();
+                }
             } else if (!result) { // something went wrong, display a short message
                 Toast.makeText(getApplicationContext(),
                         "Logbook feature not available. Please try again later.",
