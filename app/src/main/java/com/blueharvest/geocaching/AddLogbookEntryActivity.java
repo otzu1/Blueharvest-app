@@ -22,7 +22,9 @@ public class AddLogbookEntryActivity extends AppCompatActivity {
 
     public void onBackPressed() {
         //Log.d(TAG, "onBackPressed");
-        startActivity(new Intent(AddLogbookEntryActivity.this, ViewGeocacheActivity.class));
+        Intent intent = new Intent(AddLogbookEntryActivity.this, ViewGeocacheActivity.class);
+        intent.putExtra("code", getIntent().getStringExtra("code")); // send it back
+        startActivity(intent);
     }
 
     protected void onCreate(Bundle savedInstanceState) {
