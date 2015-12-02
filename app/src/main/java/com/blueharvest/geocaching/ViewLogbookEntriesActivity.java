@@ -80,6 +80,7 @@ public class ViewLogbookEntriesActivity extends AppCompatActivity {
                     // Attach the adapter to a ListView
                     ((ListView) findViewById(R.id.logbookentries)).setAdapter(a);
                 } else if (l.getEntries().size() == 0) { // none to show, let the user decide what to do
+                    // see http://www.android-examples.com/create-custom-alert-dialog-box-in-android-example/
                     new AlertDialog.Builder(ViewLogbookEntriesActivity.this)
                             .setTitle("No Logbook Entries")
                             .setMessage("Would you like to add a logbook entry?")
